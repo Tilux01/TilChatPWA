@@ -1,0 +1,36 @@
+.side-components-parent{
+    width: 600px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.196);
+    border-radius: 20px;
+    display: flex;
+    margin-top: 0;
+    overflow: hidden;
+    height: 100vh;
+}
+.chats-Parent-overall{
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+.side-components-parent{
+}
+@media screen and (max-width: 1235px) {
+    .side-components-parent{
+        width: 550px;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .side-components-parent{
+        flex-direction: column-reverse;
+        overflow: hidden;
+    }
+    .settingsIconSider{
+        display: none !important;
+    }
+}
+@media screen and (max-width: 800px) {
+    .side-components-parent{
+        width: 100%;
+    }
+}

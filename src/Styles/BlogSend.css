@@ -1,0 +1,81 @@
+.blogSend header{
+    padding-left: 20px;
+}
+.blogSend header .profile img{
+    width: 40px !important;
+    height: 40px !important;
+}
+.blogSend .welcome-input{
+    height: 50px;
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    padding: 0 !important;
+    bottom: 20px;
+    margin: 0 !important;
+}
+.blogSend .welcome-input input{
+    width: 85%;
+    padding: 17px;
+    padding-left: 50px;
+    font-weight: 600;
+    background: hsla(0, 0%, 0%, 0.314);
+    border: 0;
+    box-shadow: 0px 0px 10px #2176ff6b;
+    color: white;
+    margin-top: 10px;
+    outline: 0;
+    border-radius: 20px;
+}
+.blogSend .welcome-input img{
+    width: 27px;
+    position: absolute;
+    right: 10%;
+    transform: translate(0%,18%);
+    filter: invert(1) opacity(.4);
+    cursor: pointer;
+}
+.blogSend .welcome-input .addBtn{
+    left: 10%;
+    bottom: 12px;
+    width: 22px;
+}
+.blogSend .blogContent{
+    width: 100vw;
+    height: calc(100vh - 140px);
+    overflow: hidden;
+
+    overflow-y: scroll;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+    flex-direction: column;
+}
+.blogSend .blogContent div{
+    width: 100%;
+    max-width: 450px;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: rgba(128, 128, 128, 0.342);
+    margin-bottom: 10px;
+}
+.blogSend .blogContent main{
+    width: 90%;
+    height: 100%;
+}
+.blogSend .blogContent div img{
+    width: 100%;
+    margin-bottom: 5px;
+    max-height: 400px;
+    object-fit: contain;
+}
+.blogSend .blogContent div p{
+    font-weight: 600;
+    color: whitesmoke;
+}

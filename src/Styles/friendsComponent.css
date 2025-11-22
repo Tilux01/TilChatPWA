@@ -1,0 +1,154 @@
+.friends-Parent-overall{
+    width: 100%;
+}
+.friends-overall{
+    /* width: 100%;
+    height: 100%; */
+    display: flex;
+    justify-content: start;
+    top: 0;
+    padding-top: 35px;
+    left: 0;
+    flex-direction: column;
+}
+.friends-overall .SearchBtn{
+    background: #2176ff;
+    height: 100%;
+    width: 80px;
+    color: whitesmoke;
+    font-weight: 600;
+    height: 41px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    cursor: pointer;
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.friends-overall h1{
+    font-size: 40px;
+    color: whitesmoke;
+    margin-left: 10px;
+    margin-bottom: 20px;
+}
+.friends-overall h2{
+    font-size: 30px;
+    margin-bottom: 5px;
+    color: whitesmoke;
+    display: none;
+}
+.friends-overall input[type="text"]{
+    margin-left: 10px;
+    padding: 13px;
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    background: hsl(0, 0%, 20%);
+    border-radius: 10px;
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.friends-overall .friends-parent{
+    margin-top: 10px;
+    padding-right: 10px;
+    height: 70vh;
+    overflow-y: scroll;
+}
+.friends-overall .friends-parent::-webkit-scrollbar{
+    width: 2px;
+}
+.friends-overall .friends-parent::-webkit-scrollbar-thumb{
+    background: rgba(128, 128, 128, 0.164);
+}
+.friends-overall .friends-parent .friends{
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.friends-overall .friends-parent .friends img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+    margin-right: 10px;
+}
+.friends-overall .friends-parent .friends > div{
+    border-top: 1px solid rgba(255, 255, 255, 0.062);
+    width: 90%;
+    padding: 2px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+.friends-overall .friends-parent .friends > div p{
+    font-weight: 600;
+    font-size: 17px;
+    width: 150px;
+    overflow: scroll;
+    color: whitesmoke;
+}
+.friends-overall .friends-parent .friends > div p::-webkit-scrollbar{
+    display: none;
+}
+.friends-overall .friends-parent .friends > div .Btn{
+    display: flex;
+    gap: 5px;
+}
+.friends-overall .friends-parent .friends > div .Btn button{
+    border-radius: 15px;
+    padding: 10px 0px;
+    width: 65px;
+    border: 0;
+    font-weight: 600;
+    color: whitesmoke;
+    cursor: pointer;
+}
+.friends-overall .friends-parent .friends > div .Btn .follow-back-btn{
+    width: 130px;
+}
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(1){
+    background: #2176ff;
+}
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(2){
+    background: orangered;
+}
+.friends-overall .friends-parent .friends > div .message-btn{
+    background: hsl(0, 0%, 20%) !important;
+    width: 130px !important;
+}
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(1):hover,
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(1):focus,
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(1):active{
+    background: hsl(217, 100%, 46%);
+}
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(2):hover,
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(2):focus,
+.friends-overall .friends-parent .friends > div .Btn button:nth-child(2):active{
+    background: hsl(16, 100%, 40%);
+}
+
+
+
+@media screen and (max-width: 1350px) {
+    .friends-overall .friends-parent .friends > div .message-btn{
+        padding: 10px !important;
+        width: 90px !important;
+    }
+}
+
+@media screen and (max-width:800px) {
+    .friends-overall .friends-parent{
+        padding-left: 10px;
+        padding-right: 0px;
+    }
+    .friends-overall .friends-parent .friends > div p{
+        flex: 1;
+    }
+}

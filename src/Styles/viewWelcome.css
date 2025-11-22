@@ -1,0 +1,118 @@
+.view-overall{
+    width: 100% !important;
+    height: 100vh;
+    overflow-y: scroll;
+}
+.view-overall::-webkit-scrollbar{
+    display: none;
+}
+header{
+    width: 68%;
+    height: 60px;
+    background-color: 111213;
+    box-shadow: 0px 5px 10px rgba(255, 254, 254, 0.062);
+    display: flex;
+    position: fixed;
+    top: 0;
+}
+header .profile{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+header .profile img:nth-child(1){
+    opacity: .6;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+header .profile img:nth-child(2){
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #2176ff;
+    cursor: pointer;
+}
+header .profile p{
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+header .settings{
+    display: flex;
+    gap: 2rem;
+    padding-right: 20px;
+    align-items: center;
+}
+header .settings img{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.view-overall .welcome-view{
+    width: 100%;
+    height: 85%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.view-overall .welcome-view img{
+    width: 200px;
+    filter: invert(1) opacity(.3);
+    margin-top: 5%;
+    animation: wave 2s linear infinite;
+}
+.view-overall .welcome-view p{
+    font-size: 30px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.558);
+}
+.view-overall .welcome-input{
+    height: 15%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.view-overall .welcome-input input{
+    width: 85%;
+    padding: 17px;
+    font-weight: 600;
+    background: hsla(0, 0%, 0%, 0.314);
+    border: 0;
+    box-shadow: 0px 0px 10px #2176ff6b;
+    color: white;
+    margin-top: 10px;
+    outline: 0;
+    border-radius: 20px;
+}
+.view-overall .welcome-input img{
+    width: 30px;
+    position: absolute;
+    right: 5%;
+    transform: translate(0%,20%);
+    filter: invert(1) opacity(.4);
+    cursor: pointer;
+}
+.headHide{
+    display: none;
+}
+
+@keyframes wave {
+    50%{
+        transform: rotate(10deg);
+    }
+}
+@media screen and (max-width:800px) {
+    header{
+        width: 100%;
+    }
+    .headHide{
+        display: flex;
+    }
+}

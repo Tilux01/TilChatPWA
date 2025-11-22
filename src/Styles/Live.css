@@ -1,0 +1,153 @@
+.live-Parent-overall{
+    width: 100%;
+}
+.live-overall{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.live-overall h1{
+    font-size: 40px;
+    color: whitesmoke;
+    margin-left: 10px;
+    margin-top: 35px;
+    margin-bottom: 20px;
+}
+
+.live-overall .liveBrowse{
+    width: 100%;
+    margin-top: 10px;
+    padding-left: 10px;
+}
+.live-overall .liveBrowse h2{
+    color: whitesmoke;
+    margin-bottom: 10px;
+}
+.live-overall .liveBrowse div{
+    display: flex;
+    gap: 10px;
+    overflow: scroll;
+}
+.live-overall .liveBrowse div::-webkit-scrollbar{
+    display: none;
+}
+.live-overall .liveBrowse div .liveBrowse-btn{
+    padding: 8px 10px;
+    background: #2176ff;
+    color: whitesmoke;
+    cursor: pointer;
+    border: 0;
+    font-weight: 600;
+    border-radius: 20px;
+    transition: all 0.2 ease;
+}
+.live-overall .liveBrowse div .liveBrowse-btn:hover,
+.live-overall .liveBrowse div .liveBrowse-btn:active,
+.live-overall .liveBrowse div .liveBrowse-btn:focus{
+    background: hsl(217, 100%, 46%);
+}
+.live-overall .search-parent{
+    display: flex;
+}
+.live-overall .search-parent input[type="text"]{
+    margin-left: 10px;
+    padding: 10px;
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    background: hsl(0, 0%, 20%);
+    border-radius: 10px;
+    width: 75%;
+}
+.live-overall .search-parent button{
+    background: #2176ff;
+    width: 25%;
+    border-radius: 0px 20px 20px 0px;
+    border: 0;
+    position: relative;
+    left: -20px;
+    color: whitesmoke;
+    font-weight: 600;
+}
+.live-overall .live-parent{
+    margin-top: 30px;
+    padding-right: 10px;
+    height: 70vh;
+    overflow-y: scroll;
+}
+.live-overall .live-parent::-webkit-scrollbar{
+    width: 2px;
+}
+.live-overall .live-parent::-webkit-scrollbar-thumb{
+    background: rgba(128, 128, 128, 0.164);
+}
+.live-overall .live-parent .live{
+    position: relative;
+    height: 100px;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.live-overall .live-parent .live img{
+    width: 100px;
+    height: 60px;
+    margin-right: 10px;
+    border-radius: 10px;
+    object-fit: contain;
+}
+.live-overall .live-parent .live button{
+    position: absolute;
+    right: 2%;
+    border: 0;
+    background-color: orangered;
+    color: whitesmoke;
+    padding: 10px 15px;
+    font-weight: 600;
+    border-radius: 15px;
+}
+.live-overall .live-parent .live button:hover,
+.live-overall .live-parent .live button:focus,
+.live-overall .live-parent .live button:active{
+    background-color: #545455;
+    cursor: pointer;
+}
+.live-overall .live-parent .live > div{
+    border-top: 1px solid rgba(255, 255, 255, 0.062);
+    width: 90%;
+    padding: 2px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+.live-overall .live-parent .live > div div{
+    width: 250px;
+}
+.live-overall .live-parent .live > div div p{
+    font-weight: 600;
+    font-size: 17px;
+    width: 100%;
+    overflow: scroll;
+    color: whitesmoke;
+}
+.live-overall .live-parent .live > div div small{
+    font-weight: 600;
+    font-size: 12px;
+    width: 100%;
+    overflow: scroll;
+    color: rgba(245, 245, 245, 0.308);
+}
+.live-overall .live-parent .live > div div p::-webkit-scrollbar{
+    display: none;
+}
+@media screen and (max-width: 847px) {
+    .live-overall{
+        width: 100%;
+        padding-left: 10px;
+    }
+    .live-overall .live-parent{
+        padding-left: 10px;
+    }
+}

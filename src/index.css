@@ -1,0 +1,81 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    outline: 0;
+}
+
+body{
+    width: 100%;
+    height: 100%;
+    background-color: #111213;
+    overflow: hidden;
+}
+#root{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    align-items: center;
+    height: 100vh;
+    position: absolute;
+    bottom: 0;
+}
+button{
+    outline: 0 !important;
+}
+.navigateArrow{
+    display: none;
+}
+.moreOption{
+    width: 35px;
+    height: 35px;
+    filter: invert(1);
+    position: absolute;
+    top: 35px;
+    right: 20px;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.moreOption:hover,
+.moreOption:active,
+.moreOption:focus{
+    background: rgba(128, 128, 128, 0.452);
+}
+.optionList{
+    position: absolute;
+    color: whitesmoke;
+    right: 25px;
+    top: 75px;
+    background: hsl(0, 0%, 6%);
+    width: 120px;
+    height: auto;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+.optionList .option{
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.optionList .option:hover,
+.optionList .option:active,
+.optionList .option:focus{
+    background:rgba(128, 128, 128, 0.11);;
+}
+.optionList .settings{
+    display: none;
+}
+.optionList .option p{
+    font-weight: 600;
+    font-size: 14px;
+}
+@media screen and (max-width: 1000px) {
+    .optionList .settings{
+        display: block;
+    }
+}

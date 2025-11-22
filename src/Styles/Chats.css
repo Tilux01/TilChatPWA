@@ -1,0 +1,114 @@
+.chats-Parent-overall{
+    width: 100%;
+}
+.chats-overall{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.chats-overall h1{
+    font-size: 40px;
+    color: whitesmoke;
+    margin-left: 10px;
+    margin-top: 35px;
+    margin-bottom: 10px;
+}
+.chats-overall input[type="text"]{
+    margin-left: 10px;
+    padding: 10px;
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    background: hsl(0, 0%, 20%);
+    border-radius: 10px;
+    width: 80%;
+}
+.chats-overall .archived-parent{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.041);
+    cursor: pointer;
+    align-items: center;
+    padding: 3px 0px;
+    padding-right: 5px;
+}
+.chats-overall .archived-parent:hover,
+.chats-overall .archived-parent:focus,
+.chats-overall .archived-parent:active{
+    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.041);
+}
+.chats-overall .archived-parent div{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 2px;
+}
+.chats-overall .archived-parent div img{
+    width: 22px;
+    filter: opacity(.7) invert(1);
+}
+.chats-overall .archived-parent div p{
+    color: whitesmoke;
+    font-weight: 600;
+}
+.chats-overall .archived-parent h6{
+    font-size: 18px;
+    font-weight: 800;
+    text-shadow: 0px 0px 10px #2176ff38;
+    color: #2176ff;
+    margin-right: 5px;
+}
+.chats-overall .chats-parent{
+    margin-top: 20px;
+    padding-right: 10px;
+    height: 70vh;
+    overflow-y: scroll;
+}
+.chats-overall .chats-parent::-webkit-scrollbar{
+    width: 2px;
+}
+.chats-overall .chats-parent::-webkit-scrollbar-thumb{
+    background: rgba(128, 128, 128, 0.164);
+}
+.chats-overall .chats-parent .chat{
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+}
+.chats-overall .chats-parent .chat img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+    margin-right: 10px;
+}
+.chats-overall .chats-parent .chat div{
+    border-top: 1px solid rgba(255, 255, 255, 0.062);
+    width: 90%;
+    padding: 2px;
+    height: 100%;
+}
+.chats-overall .chats-parent .chat div p{
+    font-weight: 600;
+    color: whitesmoke;
+    margin-top: 5px;
+}
+.chats-overall .chats-parent .chat div small{
+    color: whitesmoke;
+    opacity: .5;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+
+@media screen and (max-width: 847px) {
+    .chats-overall{
+        padding-left: 15px;
+    }
+}

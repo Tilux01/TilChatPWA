@@ -1,0 +1,103 @@
+.sendOverall{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.808);
+    backdrop-filter: blur(20px);
+    top: 0;
+    left: 0;
+    z-index: 40000;
+    padding-top: 5vh;
+}
+.loaderImg{
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    filter: invert(1);
+    width: 70px;
+    animation: rotateLoader 1s linear infinite;
+}
+@keyframes rotateLoader {
+    0%{
+        transform: translate(-50%, -50%) rotate(0deg) ;
+    }
+    100%{
+        transform: translate(-50%, -50%) rotate(-360deg);
+    }
+}
+.sendOverall .previewBox{
+    width: 100vw;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 3.5vh;
+    position: relative;
+}
+.sendOverall .previewBox img,
+.sendOverall .previewBox video{
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    object-fit: contain;
+}
+.sendOverall .previewBox video{
+    max-width: 1000px;
+}
+.sendOverall .caption{
+    width: 100%;
+    height: 15vh;
+    padding: 0px 30px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.sendOverall .caption .shrink{
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.sendOverall .caption input{
+    border: 2px solid rgba(255, 255, 255, 0.096);
+    width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    background: transparent;
+    padding: 0px 0px 0px 20px;
+    font-size: 15px;
+    color: white;
+    font-weight: bold;
+}
+.sendOverall .caption img{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+    filter: invert(1) opacity(.5);
+}
+.sendOverall .close{
+    filter: invert(1);
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(128, 128, 128, 0.281);
+    border-radius: 50%;
+    cursor: pointer;
+}
+.sendOverall .close.close:hover{
+    width: 90px ;
+    height: 90px;
+    padding: 40px 13px 10px 40px;
+    top: -30px;
+    left: -30px;
+}
