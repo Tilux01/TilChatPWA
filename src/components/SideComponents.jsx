@@ -349,18 +349,9 @@ const SideComponents = (props) => {
         const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
         const profilePic = senderImg?.profilePic || logo;
         
-        // 1. Show notification (your existing function) - TAB OPEN
         notification(note.prompt, note.sender, profilePic);
         
         // 2. ALSO send to service worker for background - TAB OPEN
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.ready.then(registration => {
-            registration.showNotification(note.sender, {
-              body: note.prompt,
-              icon: profilePic
-            });
-          });
-        }
       });
       
       set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
