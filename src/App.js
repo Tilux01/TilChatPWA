@@ -13,6 +13,7 @@ import { getDatabase, ref, push, set, get, query, onValue, orderByChild, equalTo
 import { getMessaging, getToken, deleteToken, onMessage } from 'firebase/messaging';
 import BlogSend from './components/BlogSend.jsx'
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyCoDIlOAkemogzj-Gw2G_lVO7VI7uEeIG8",
   authDomain: "tilchat-91043.firebaseapp.com",
@@ -43,118 +44,180 @@ function Home(props) {
   const [userName, setUserName] = useState()
   const [userCredentials, setUserCredentials] = useState([])
   const [chatState, setChatState] = useState("sider")
+  const [showPermissionButton, setShowPermissionButton] = useState(false) // ADD THIS LINE
+  
   useEffect(() => {
     if (window.innerWidth > 800) {
       setChatState(()=>"")
     }
   }, [])
+  
   const userNameGet = localStorage.getItem("TilChat")
-      useEffect(() => {
-          if(!userNameGet){
-              navigate("/signup")
-          }
-          else{
-              setUserName(JSON.parse(userNameGet).UserName)
-              
-          }
-      }, [navigate])
+  
+  useEffect(() => {
+    if(!userNameGet){
+      navigate("/signup")
+    }
+    else{
+      setUserName(JSON.parse(userNameGet).UserName)
+    }
+  }, [navigate])
 
-      useEffect(() => {
-        if(userNameGet){
-          const user = JSON.parse(userNameGet).UserName
-          onValue(ref(db, `Users/${user}/onlineCheck`), (result)=>{
-            if (result.val()) {
-              set(ref(db, `Users/${user}/onlineCheck`), null)
-            }
-          })
+  useEffect(() => {
+    if(userNameGet){
+      const user = JSON.parse(userNameGet).UserName
+      onValue(ref(db, `Users/${user}/onlineCheck`), (result)=>{
+        if (result.val()) {
+          set(ref(db, `Users/${user}/onlineCheck`), null)
         }
-      }, [])
-    
-      useEffect(() => {
-          const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
-          get(ref(db,`Users/${userNameLoc? userNameLoc.UserName : null}`))
-          .then((output)=>{
-              if(output.exists()){
-                  setUserCredentials(output.val())
-              }
-          })
-      }, [])
-
- const setupWebPush = async () => {
-  if (!("serviceWorker" in navigator)) return;
-
-  try {
-    // Check current permission status
-    const permission = Notification.permission;
-    
-    console.log('Current notification permission:', permission);
-
-    if (permission === 'default') {
-      // Permission hasn't been requested yet - show your custom UI
-      console.log('🟡 Notification permission not requested yet');
-      // You can set a state to show a custom permission button
-      // setShowPermissionButton(true);
-      return; // Don't proceed with push setup
+      })
     }
+  }, [])
 
-    if (permission !== 'granted') {
-      console.log('❌ Notification permission denied by user');
-      return;
+  useEffect(() => {
+    const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
+    get(ref(db,`Users/${userNameLoc? userNameLoc.UserName : null}`))
+    .then((output)=>{
+      if(output.exists()){
+        setUserCredentials(output.val())
+      }
+    })
+  }, [])
+
+  // Function to check subscription status
+  const checkSubscriptionStatus = async (userId) => {
+    try {
+      const response = await fetch("http://localhost:3001/check-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId })
+      });
+      
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log("Error checking subscription:", error);
+      return { valid: false, reason: "CHECK_ERROR" };
     }
+  };
 
-    // Only proceed if permission is granted
-    console.log('✅ Notification permission already granted');
+  // Function to refresh subscription
+  const refreshSubscription = async (userId, newSubscription) => {
+    try {
+      const response = await fetch("http://localhost:3001/refresh-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          userId, 
+          newSubscription 
+        })
+      });
+      
+      return await response.json();
+    } catch (error) {
+      console.log("Error refreshing subscription:", error);
+      return { success: false };
+    }
+  };
 
+  // Helper function to create new subscription
+  const createNewSubscription = async (userId) => {
     const registration = await navigator.serviceWorker.register("/sw.js");
-    console.log("✅ Service worker registered.");
-
-    // Remove old subscription if it exists
+    
     const existing = await registration.pushManager.getSubscription();
     if (existing) {
-      console.log("ℹ️ Existing subscription found → unsubscribing...");
       await existing.unsubscribe();
     }
 
-    // Create a new subscription
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: "BI39fB0i19JTHx18xGN7ZToHxgJJMg_Mk_xyMmZozNMoDMx4-tTzi6V2e5tZpkxJVxhy0ImL2m_82cZ0E78K3zc"
     });
-    console.log("✅ New subscription created:", subscription);
 
-    // Save subscription to your backend
-    const user = JSON.parse(localStorage.getItem("TilChat"));
-    if (user?.UserName) {
-      await fetch("https://tilchat-backend-1.onrender.com/save-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.UserName,
-          subscription
-        })
-      });
-      console.log("✅ Subscription saved to server.");
+    // Save the new subscription
+    await fetch("http://localhost:3001/save-subscription", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: userId,
+        subscription
+      })
+    });
+    
+    console.log("✅ New subscription created and saved");
+  };
+
+  // Permission request function
+  const requestNotificationPermission = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      setShowPermissionButton(false);
+      
+      if (permission === 'granted') {
+        console.log('✅ User granted notification permission');
+        // Now proceed with push notification setup
+        const user = JSON.parse(localStorage.getItem("TilChat"));
+        if (user?.UserName) {
+          await createNewSubscription(user.UserName);
+        }
+      } else {
+        console.log('❌ User denied notification permission');
+      }
+    } catch (error) {
+      console.log('❌ Error requesting notification permission:', error);
     }
-  } catch (err) {
-    console.log("❌ Web Push setup error:", err);
+  };
+
+  // Updated setupWebPush with expiration handling
+  const setupWebPush = async () => {
+    if (!("serviceWorker" in navigator)) return;
+
+    try {
+      const user = JSON.parse(localStorage.getItem("TilChat"));
+      if (!user?.UserName) return;
+
+      // First check if we have a valid subscription
+      const status = await checkSubscriptionStatus(user.UserName);
+      
+      if (!status.valid) {
+        console.log(`Subscription status: ${status.reason}, creating new one...`);
+        
+        // Request permission if needed
+        if (Notification.permission === 'default') {
+          setShowPermissionButton(true);
+          return;
+        }
+
+        if (Notification.permission !== 'granted') {
+          console.log('❌ Notification permission denied');
+          return;
+        }
+
+        // Create new subscription
+        await createNewSubscription(user.UserName);
+      } else {
+        console.log('✅ Subscription is valid');
+      }
+
+    } catch (err) {
+      console.log("❌ Web Push setup error:", err);
+    }
+  };
+
+  async function clearOldSubscription() {
+    const registration = await navigator.serviceWorker.ready;
+    const existing = await registration.pushManager.getSubscription();
+
+    if (existing) {
+      console.log("Found old subscription → Unsubscribing...");
+      await existing.unsubscribe();
+    }
   }
-};
 
-async function clearOldSubscription() {
-  const registration = await navigator.serviceWorker.ready;
-  const existing = await registration.pushManager.getSubscription();
-
-  if (existing) {
-    console.log("Found old subscription → Unsubscribing...");
-    await existing.unsubscribe();
-  }
-}
-
-
-useEffect(() => {
-  console.log('🚀 App mounted, setting up FCM...');
-  setupWebPush();
-}, []);
+  useEffect(() => {
+    console.log('🚀 App mounted, setting up FCM...');
+    setupWebPush();
+  }, []);
     
     
     
