@@ -56,6 +56,22 @@ const FriendsComponent = (props) => {
         })
     }, [])
 
+    const sendToNodeServer = async (recipientUserId, senderUserName, message) => {
+        try {
+            await fetch('https://tilchat.onrender.com/send-notification', {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                toUserId: recipientUserId,
+                fromUser: senderUserName, 
+                message: message
+            })
+            });
+        } catch (error) {
+            console.log('Node server notification failed:', error);
+        }
+    };
+
 
     const searchFriends = async () => {
         setButtonActive(false)
@@ -130,6 +146,7 @@ const FriendsComponent = (props) => {
             update(ref(db,"Users/"+userName),{
                 friendsArray:[...friends,{UserName:params.UserName,Validate:true,FullName:params.FullName}],
             })
+            sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userCredentials.UserName} sent you a  friend request`)
         })
     }
 
@@ -192,6 +209,7 @@ const FriendsComponent = (props) => {
                         update(ref(db, `Users/${output.UserName}`),{
                             newFriends: newFriend
                         })
+                        sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userCredentials.UserName} confirmed your friend request`)
                     })
                 })
             })

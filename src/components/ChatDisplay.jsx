@@ -572,7 +572,7 @@ const ChatDisplay = (props) => {
                                 if (result.exists()) {
                                     friendNotifications = result.val()
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -580,7 +580,7 @@ const ChatDisplay = (props) => {
                                 else{
                                     friendNotifications = []
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -655,7 +655,7 @@ const ChatDisplay = (props) => {
                                 if (result.exists()) {
                                     friendNotifications = result.val()
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -663,7 +663,7 @@ const ChatDisplay = (props) => {
                                 else{
                                     friendNotifications = []
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
