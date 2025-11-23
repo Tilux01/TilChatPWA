@@ -306,7 +306,7 @@ const ChatDisplay = (props) => {
 
     const sendToNodeServer = async (recipientUserId, senderUserName, message) => {
         try {
-            await fetch('http://localhost:3001/send-notification', {
+            await fetch('https://tilchat.onrender.com/send-notification', {
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -87,7 +87,7 @@ function Home(props) {
   // Function to check subscription status
   const checkSubscriptionStatus = async (userId) => {
     try {
-      const response = await fetch("http://localhost:3001/check-subscription", {
+      const response = await fetch("https://tilchat.onrender.com/check-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId })
@@ -104,7 +104,7 @@ function Home(props) {
   // Function to refresh subscription
   const refreshSubscription = async (userId, newSubscription) => {
     try {
-      const response = await fetch("http://localhost:3001/refresh-subscription", {
+      const response = await fetch("https://tilchat.onrender.com/refresh-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -135,7 +135,7 @@ function Home(props) {
     });
 
     // Save the new subscription
-    await fetch("http://localhost:3001/save-subscription", {
+    await fetch("https://tilchat.onrender.com/save-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
