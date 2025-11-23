@@ -332,22 +332,6 @@ const SideComponents = (props) => {
         })
     }, [])
 
-    const sendToNodeServer = async (recipientUserId, senderUserName, message) => {
-        try {
-            await fetch('https://tilchat-backend-1.onrender.com/send-notification', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                toUserId: recipientUserId,
-                fromUser: senderUserName,
-                message: message
-            })
-            });
-        } catch (error) {
-            console.log('Node server notification failed:', error);
-        }
-        };
-
     useEffect(() => {
   const userNameLoc = JSON.parse(localStorage.getItem("TilChat"));
   
@@ -377,9 +361,6 @@ const SideComponents = (props) => {
             });
           });
         }
-        
-        // 3. NEW: Send to Node.js server for TAB CLOSED scenario
-        sendToNodeServer(userNameLoc.UserName, note.sender, note.prompt);
       });
       
       set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
