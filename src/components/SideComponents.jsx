@@ -349,7 +349,7 @@ const SideComponents = (props) => {
         const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
         const profilePic = senderImg?.profilePic || logo;
         
-        notification(note.prompt, note.sender, profilePic);
+        // notification(note.prompt, note.sender, profilePic);
         
         // 2. ALSO send to service worker for background - TAB OPEN
       });
