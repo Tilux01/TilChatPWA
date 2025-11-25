@@ -129,9 +129,10 @@ const ChatDisplay = (props) => {
         }
     }
     const closeVn = () =>{
+        audioTag.current.pause()
+        setVoiceNoteSrc(null)
         setMicShow(()=>true)
         vnData.current = null
-        setVoiceNoteSrc(null)
         setRecordState(()=>recordVoice)
         setVoicePreviewState(()=>pauseBtn)
     }
@@ -232,6 +233,7 @@ const ChatDisplay = (props) => {
     }
 
     useEffect(() => {
+        setMicShow(()=>true)
         getChat(props.chatInfo)
         .then((output)=>{
             if (output) {
