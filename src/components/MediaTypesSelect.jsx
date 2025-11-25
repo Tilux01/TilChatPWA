@@ -40,6 +40,14 @@ const MediaTypesSelect = ({type, data, setPreviewMedia, previewSrc, previewType,
                 )
             }
         }
+        else if(type == "audio/webm;codecs=opus"){
+            
+            if (data) {
+                return(
+                    <audio src={data} controls></audio>
+                )
+            }
+        }
         // else{
         //     if(data){
         //         const blob = new Blob([data], { type: type });

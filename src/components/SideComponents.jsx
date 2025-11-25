@@ -333,31 +333,26 @@ const SideComponents = (props) => {
     }, [])
 
     useEffect(() => {
-  const userNameLoc = JSON.parse(localStorage.getItem("TilChat"));
-  
-  onValue(ref(db, `Users/${userNameLoc?.UserName}/notifications`), (output) => {
-    if (output.exists()) {
-      const holdNotification = output.val();
-      
-      holdNotification.forEach((note) => {
-        // Your existing logic
-        if(props.chatInfo === userNameLoc.UserName+note.sender || 
-           props.chatInfo === note.sender+userNameLoc.UserName) {
-          return; // Skip if current chat
+    const userNameLoc = JSON.parse(localStorage.getItem("TilChat"));
+    
+    onValue(ref(db, `Users/${userNameLoc?.UserName}/notifications`), (output) => {
+        if (output.exists()) {
+        const holdNotification = output.val();
+        
+        holdNotification.forEach((note) => {
+            if(props.chatInfo === userNameLoc.UserName+note.sender || 
+            props.chatInfo === note.sender+userNameLoc.UserName) {
+            return; 
+            }
+            
+            const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
+            const profilePic = senderImg?.profilePic || logo;
+        });
+        
+        set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
         }
-        
-        const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
-        const profilePic = senderImg?.profilePic || logo;
-        
-        // notification(note.prompt, note.sender, profilePic);
-        
-        // 2. ALSO send to service worker for background - TAB OPEN
-      });
-      
-      set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
-    }
-  });
-}, []);
+    });
+    }, []);
 
     useEffect(() => {
         setChatSearchFilter(mutualRender)

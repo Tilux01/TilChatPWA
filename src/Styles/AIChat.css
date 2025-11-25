@@ -354,6 +354,48 @@ iframe{
     position: absolute;
     bottom: 70px;
 } */
+.voiceNote{
+    display: flex;
+    justify-self: center;
+    overflow: hidden;
+    justify-content: space-between;
+    width: 85%;
+    padding: 12px 15px;
+    font-weight: 600;
+    background: hsla(0, 0%, 0%, 0.314);
+    border: 0;
+    box-shadow: 0px 0px 10px #2176ff6b;
+    color: white;
+    margin-top: 10px;
+    outline: 0;
+    border-radius: 20px;
+}
+.voiceNote img{
+    width: 25px;
+    filter: invert(1);
+    cursor: pointer;
+}
+.voiceNote img:nth-child(1){
+    filter: invert(1) brightness(.6);
+}
+.voiceNote img:nth-child(2){
+    scale: 2;
+    background: #de8900;
+    border-radius: 50%;
+    padding: 5px;
+}
+.recordingPauseBtn{
+    background: #de8900;
+    border-radius: 50%;
+    width: 30px !important;
+    height: 30px;
+    border: 2px solid red;
+    padding: 2px;
+}
+audio{
+    /* background: blue; */
+    filter: opacity(.8);
+}
 
 
 @keyframes increase {
@@ -386,10 +428,14 @@ iframe{
         display: flex;
     }
     
+    
 }
 @media screen and (max-width: 550px) {
     .view-overall .welcome-view-ai .chat-log main{
         max-width: 80%;
+    }
+    audio{
+        width: 70vw;
     }
 }
 @media screen and (max-width:450px) {

@@ -9,7 +9,8 @@ import gallery from "../images/picture.png"
 import imagePreview from "../images/photo (1).png"
 import videoPreview from "../images/video.png"
 import cameraIcon from "../images/camera.png"
-import playBtn  from "../images/play-1073616_640.png"
+import playBtn  from "../images/play-buttton.png"
+import pauseBtn from "../images/pause.png"
 import documentIcon from "../images/documentation.png"
 import contactIcon from "../images/mobile.png"
 import locationIcon from "../images/location (1).png"
@@ -30,6 +31,8 @@ import errorSend from "../images/mark (1).png"
 import online from "../images/double-tick (2).png"
 import seen from "../images/double-tick (1).png"
 import close from "../images/ad6f8ce5-b6ba-4bde-b4af-a6d0b3db434c.png"
+import recordVoice from "../images/mic.png"
+import stopVoiceRecording from "../images/stop-button.png"
 
 
 const firebaseConfig = {
@@ -72,6 +75,13 @@ const ChatDisplay = (props) => {
     const [replyMsg, setReplyMsg] = useState(null)
     const allType = useRef([])
     const [friendTyping, setFriendTyping] = useState(false)
+    const [micShow, setMicShow] = useState(true)
+    const [recordState, setRecordState] = useState(recordVoice)
+    const [voiceNoteSrc, setVoiceNoteSrc] = useState()
+    const [voicePreviewState, setVoicePreviewState] = useState(pauseBtn)
+    const audioTag = useRef("")
+    const vnData = useRef()
+    
     
     
     const preview = (data, type) =>{
@@ -81,6 +91,7 @@ const ChatDisplay = (props) => {
     }
     const typing = () =>{
         if (userPrompt.current.value.length == 0) {
+            setMicShow(()=>true)
             get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
             .then((output)=>{
                 let typingUsers = []
@@ -94,6 +105,7 @@ const ChatDisplay = (props) => {
             })
         }
         else if(userPrompt.current.value.length > 0){
+            setMicShow(()=>false)
             get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
             .then((output)=>{
                 let typingUsers = []
@@ -114,6 +126,57 @@ const ChatDisplay = (props) => {
                     })
                 }
             })
+        }
+    }
+    const closeVn = () =>{
+        setMicShow(()=>true)
+        vnData.current = null
+        setVoiceNoteSrc(null)
+        setRecordState(()=>recordVoice)
+        setVoicePreviewState(()=>pauseBtn)
+    }
+    const streamNote = useRef()
+    const voiceData = useRef()
+    const chunks = useRef([])
+    const voiceNote = async() =>{
+        if(recordState == recordVoice){
+            streamNote.current = await navigator.mediaDevices.getUserMedia({audio: true})
+            voiceData.current = new MediaRecorder(streamNote.current, { 
+            mimeType: 'audio/webm;codecs=opus' 
+            })
+            setRecordState(stopVoiceRecording)
+            voiceData.current.ondataavailable = (e)=>{
+                chunks.current.push(e.data)
+            }
+            
+        }
+        else{
+            setRecordState(recordVoice)
+            if (voiceData.current.state === 'recording') {
+                voiceData.current.stop();
+            }
+        }
+        voiceData.current.onstop = ()=>{
+            const blob = new Blob(chunks.current, {type: "audio/webm;codecs=opus"})
+            const reader = new FileReader
+            reader.addEventListener("load", (e)=>{
+                vnData.current =  e.target.result
+            })
+            reader.readAsDataURL(blob)
+            const url = URL.createObjectURL(blob)
+            chunks.current = []
+            setVoiceNoteSrc(url)
+        }
+        voiceData.current.start()
+    }
+    const pausePlayVoice = () =>{
+        if (voicePreviewState == playBtn) {
+            audioTag.current.play()
+            setVoicePreviewState(pauseBtn)
+        }
+        else{
+            audioTag.current.pause()
+            setVoicePreviewState(playBtn)
         }
     }
     const scrollChat = useRef(null)
@@ -316,9 +379,129 @@ const ChatDisplay = (props) => {
             })
             });
         } catch (error) {
-            console.log('Node server notification failed:', error);
         }
     };
+
+    const sendVN = () =>{
+        get(ref(db, "Messages/"+props.chatInfo))
+        .then((output)=>{
+            if(!output.val().chatArray || output.val().chatArray == "No message" || typeof(output.val().message) == "string"){
+                setChatArray(prev=>[...prev, {[userName]:{
+                    voiceNote: vnData.current,
+                    progress: sending,
+                    reply:replyMsg,
+                }}])
+                set(ref(db,"Messages/"+props.chatInfo),{
+                    chatArray: [{[userName]:{
+                        voiceNote: vnData.current,
+                        reply:replyMsg,
+                    }}]
+                })
+                .then(()=>{
+                    setMediaOption(()=>true)
+                    setMediaOption(()=>false)
+                    setLoading(()=>false)
+                    setMicShow(()=>true)
+                    set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                        user: userName
+                    })
+                    setChatArray((prev)=>prev.slice(0, -1))
+                    setChatArray(prev=>[...prev, {[userName]:{
+                        voiceNote: vnData.current,
+                        progress: sent,
+                        reply:replyMsg,
+                    }}])
+                })
+                .finally(()=>{
+                    get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                    .then((result)=>{
+                        let friendNotifications = []
+                        const valueToPush = {
+                            prompt: `${userName} sent you a voice note`,
+                            sender: userName,
+                            reply:replyMsg,
+                        }
+                        if (result.exists()) {
+                            friendNotifications = result.val()
+                            friendNotifications.push(valueToPush)
+                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                        else{
+                            friendNotifications = []
+                            friendNotifications.push(valueToPush)
+                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                    })
+                })
+            }
+            else{
+                let tempData = output.val().chatArray
+                tempData.push({[userName]:{voiceNote: vnData.current,reply:replyMsg,}})
+                setChatArray(prev=>[...prev, {[userName]:{
+                    voiceNote: vnData.current,
+                    progress: sending,
+                    reply:replyMsg
+                }}])
+                set(ref(db,"Messages/"+props.chatInfo),{
+                    chatArray: tempData
+                })
+                .then(()=>{
+                    setMediaOption(()=>true)
+                    setMediaOption(()=>false)
+                    setLoading(()=>false)
+                    setMicShow(()=>true)
+                    const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
+                    let randomValue = ""
+                    for (let index = 0; index < 12; index++) {
+                        const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+                        randomValue = randomValue + generateRandom
+                    }
+                    set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                        user: randomValue
+                    })
+                    setChatArray((prev)=>prev.slice(0, -1))
+                    setChatArray(prev=>[...prev, {[userName]:{
+                        voiceNote: vnData.current,
+                        progress: sent,
+                        reply:replyMsg
+                    }}])
+                })
+                .finally(()=>{
+                    get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                    .then((result)=>{
+                        let friendNotifications = []
+                        const valueToPush = {
+                            prompt: `${userName} sent you a voice note`,
+                            sender: userName,
+                            reply:replyMsg,
+                        }
+                        if (result.exists()) {
+                            friendNotifications = result.val()
+                            friendNotifications.push(valueToPush)
+                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                        else{
+                            friendNotifications = []
+                            friendNotifications.push(valueToPush)
+                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                    })
+                })
+            }
+        })
+    }
 
     const sendChat = () =>{
         if (!loading) {
@@ -335,7 +518,7 @@ const ChatDisplay = (props) => {
                             media: null,
                             mediaType: null,
                             mediaLink: null,
-                            reply:replyMsg
+                            reply:replyMsg,
                         }}])
                         set(ref(db,"Messages/"+props.chatInfo),{
                             chatArray: [{[userName]:{
@@ -343,7 +526,7 @@ const ChatDisplay = (props) => {
                                 media: null,
                                 mediaType: null,
                                 mediaLink: null,
-                                reply:replyMsg
+                                reply:replyMsg,
                             }}]
                         })
                         .then(()=>{
@@ -351,6 +534,7 @@ const ChatDisplay = (props) => {
                             setMediaOption(()=>true)
                             setMediaOption(()=>false)
                             setLoading(()=>false)
+                            setMicShow(()=>true)
                             set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                                 user: userName
                             })
@@ -361,7 +545,7 @@ const ChatDisplay = (props) => {
                                 media: null,
                                 mediaType: null,
                                 mediaLink: null,
-                                reply:replyMsg
+                                reply:replyMsg,
                             }}])
                         })
                         .finally(()=>{
@@ -385,7 +569,7 @@ const ChatDisplay = (props) => {
                                         mediaType: null,
                                         media: null,
                                         sender: userName,
-                                        reply:replyMsg
+                                        reply:replyMsg,
                                     }
                                     if (result.exists()) {
                                         friendNotifications = result.val()
@@ -409,7 +593,7 @@ const ChatDisplay = (props) => {
                     }
                     else{
                             let tempData = output.val().chatArray
-                            tempData.push({[userName]:{prompt:userPrompt.current.value}})
+                            tempData.push({[userName]:{prompt:userPrompt.current.value,reply:replyMsg}})
                             setChatArray(prev=>[...prev, {[userName]:{
                                 prompt:userPrompt.current.value,
                                 progress: sending,
@@ -423,6 +607,7 @@ const ChatDisplay = (props) => {
                                 setMediaOption(()=>true)
                                 setMediaOption(()=>false)
                                 setLoading(()=>false)
+                                setMicShow(()=>true)
                                 const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
                                 let randomValue = ""
                                 for (let index = 0; index < 12; index++) {
@@ -493,6 +678,11 @@ const ChatDisplay = (props) => {
     const sendMediaChat = () =>{
         if (!loading) {
             setReplyMsg(()=>null)
+            setMicShow(()=>true)
+            vnData.current = null
+            setVoiceNoteSrc(null)
+            setRecordState(()=>recordVoice)
+            setVoicePreviewState(()=>pauseBtn)
             setLoading(()=>true)
             const message = collectInputTemp
             get(ref(db, "Messages/"+props.chatInfo))
@@ -537,6 +727,7 @@ const ChatDisplay = (props) => {
                         setMediaOption(()=>false)
                         setDisplayMedia(()=>false)
                         setLoading(()=>false)   
+                        setMicShow(()=>true)
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
@@ -620,6 +811,7 @@ const ChatDisplay = (props) => {
                         setMediaOption(()=>false)
                         setDisplayMedia(()=>false)
                         setLoading(()=>false)
+                        setMicShow(()=>true)
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
@@ -718,7 +910,6 @@ const ChatDisplay = (props) => {
             setDisplayMedia(()=>true)
         })
         reader.readAsDataURL(file)
-        
     }
     useEffect(() => {
         const fetchMedia = async() =>{
@@ -731,32 +922,32 @@ const ChatDisplay = (props) => {
                 if(user != userName && userData?.mediaLink && !userData?.media){
                     get(ref(db, `Media/${userData.mediaLink}`))
                     .then((response)=>{
-                        const allChunks = response.val()
-                        let collectData = []
-                        allChunks.map((output, index) => {
-                            collectData.push(output.data)
-                        })
-                        const uint8Chunks = collectData.map(chunk => new Uint8Array(chunk));
-                        const blob = new Blob(uint8Chunks, { type: arrayToAdjust[index][user].mediaType });
-                        const url = URL.createObjectURL(blob);
-                        setChatArray(prev=>prev.map((data, i) =>
-                            i == index? {...data,[user]: {...data[user],media: blob}} : data
-                        ))
-                        allChunks.map((output, index)=>{
-                            set(ref(db, `Media/${userData.mediaLink}/${index}`), null)
-                            .then(()=>{
+                        if (response.exists()) {
+                            const allChunks = response.val()
+                            let collectData = []
+                            allChunks?.map((output, index) => {
+                                collectData.push(output.data)
                             })
-                        })
+                            const uint8Chunks = collectData.map(chunk => new Uint8Array(chunk));
+                            const blob = new Blob(uint8Chunks, { type: arrayToAdjust[index][user].mediaType });
+                            const url = URL.createObjectURL(blob);
+                            setChatArray(prev=>prev.map((data, i) =>
+                                i == index? {...data,[user]: {...data[user],media: blob}} : data
+                            ))
+                            
+                            allChunks.map((output, index)=>{
+                                set(ref(db, `Media/${userData.mediaLink}/${index}`), null)
+                                .then(()=>{
+                                })
+                            })
+                        }
                     })
                 }
             }
-            
         }
         fetchMedia()
     }, [chatArray])
-    // useEffect(() => {
-    //     scrollToBottom()
-    // }, [chatArray])
+
     const changeShowType = () =>{ 
         if(window.innerWidth <= 800){
             props.setChatState(()=>"sider")
@@ -805,6 +996,7 @@ const ChatDisplay = (props) => {
                                                     <main>
                                                         {output[`${userName}`]?.reply? (<h5 className='repliedMsg'>{output[`${userName}`].reply}</h5>) : null}
                                                         <MediaTypesSelect type={output[`${userName}`].mediaType} data={output[`${userName}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                                        <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${userName}`].voiceNote} statusPreview={statusPreview}/>
                                                         <p>{output[`${userName}`].prompt}<img src={output[`${userName}`].progress} alt="" className='progress'/></p>
                                                     </main>
                                                 </div>
@@ -814,8 +1006,9 @@ const ChatDisplay = (props) => {
                                             return(
                                                 <div className='response chat-response' key={index} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].prompt)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].prompt)}} draggable>
                                                     <main>
-                                                        {output[`${Object.keys(output)[0]}`].reply? (<h5 className='repliedMsg'>{output[`${Object.keys(output)[0]}`].reply}</h5>) : null}
+                                                        {output[`${Object.keys(output)[0]}`]?.reply? (<h5 className='repliedMsg'>{output[`${Object.keys(output)[0]}`].reply}</h5>) : null}
                                                         <MediaTypesSelect type={output[`${Object.keys(output)[0]}`].mediaType} data={output[`${Object.keys(output)[0]}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                                        <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${Object.keys(output)[0]}`].voiceNote} statusPreview={statusPreview}/>
                                                         <p>{output[`${Object.keys(output)[0]}`].prompt}</p>
                                                     </main>
                                                 </div>
@@ -894,11 +1087,21 @@ const ChatDisplay = (props) => {
                     </div>:
                     null
                 }
-                <div className="welcome-input">
-                    <input type="text" ref={userPrompt} id='userPromptDom' onChange={typing}/>
-                    <img src={linkBtn} alt="" onClick={changeMediaOption}  className='addBtn'/>
-                    <img src={send} onClick={sendChat} alt=""/>
-                </div>
+                <audio src={voiceNoteSrc} ref={audioTag} autoPlay style={{display:"none"}} onEnded={()=>setVoicePreviewState(playBtn)}></audio>
+                {voiceNoteSrc? 
+                    <div className="voiceNote">
+                        <img src={deleteImg} onClick={closeVn}/>
+                        <img src={voicePreviewState} onClick={pausePlayVoice}/>
+                        <img src={send} onClick={sendVN} style={{filter:"opacity(.6) invert(1)"}}/>
+                    </div>
+                : 
+                    <div className="welcome-input">
+                        <input type="text" ref={userPrompt} id='userPromptDom' onChange={typing}/>
+                        <img src={linkBtn} alt="" onClick={changeMediaOption}  className='addBtn'/>
+                        {micShow? <img src={recordState} className={recordState == stopVoiceRecording? "recordingPauseBtn" : null} onClick={voiceNote} alt=""/> : <img src={send} onClick={sendChat} alt=""/>}
+                    </div>
+                }
+                
             </div>
             }
         </main>

@@ -84,7 +84,6 @@ function Home(props) {
     })
   }, [])
 
-  // Function to check subscription status
   const checkSubscriptionStatus = async (userId) => {
     try {
       const response = await fetch("https://tilchat.onrender.com/check-subscription", {
@@ -96,31 +95,10 @@ function Home(props) {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.log("Error checking subscription:", error);
       return { valid: false, reason: "CHECK_ERROR" };
     }
   };
 
-  // Function to refresh subscription
-  const refreshSubscription = async (userId, newSubscription) => {
-    try {
-      const response = await fetch("https://tilchat.onrender.com/refresh-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          userId, 
-          newSubscription 
-        })
-      });
-      
-      return await response.json();
-    } catch (error) {
-      console.log("Error refreshing subscription:", error);
-      return { success: false };
-    }
-  };
-
-  // Helper function to create new subscription
   const createNewSubscription = async (userId) => {
     const registration = await navigator.serviceWorker.register("/sw.js");
     
@@ -134,7 +112,6 @@ function Home(props) {
       applicationServerKey: "BI39fB0i19JTHx18xGN7ZToHxgJJMg_Mk_xyMmZozNMoDMx4-tTzi6V2e5tZpkxJVxhy0ImL2m_82cZ0E78K3zc"
     });
 
-    // Save the new subscription
     await fetch("https://tilchat.onrender.com/save-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -143,79 +120,36 @@ function Home(props) {
         subscription
       })
     });
-    
-    console.log("✅ New subscription created and saved");
   };
 
-  // Permission request function
-  const requestNotificationPermission = async () => {
-    try {
-      const permission = await Notification.requestPermission();
-      setShowPermissionButton(false);
-      
-      if (permission === 'granted') {
-        console.log('✅ User granted notification permission');
-        // Now proceed with push notification setup
-        const user = JSON.parse(localStorage.getItem("TilChat"));
-        if (user?.UserName) {
-          await createNewSubscription(user.UserName);
-        }
-      } else {
-        console.log('❌ User denied notification permission');
-      }
-    } catch (error) {
-      console.log('❌ Error requesting notification permission:', error);
-    }
-  };
-
-  // Updated setupWebPush with expiration handling
   const setupWebPush = async () => {
     if (!("serviceWorker" in navigator)) return;
 
     try {
       const user = JSON.parse(localStorage.getItem("TilChat"));
       if (!user?.UserName) return;
-
-      // First check if we have a valid subscription
       const status = await checkSubscriptionStatus(user.UserName);
       
       if (!status.valid) {
-        console.log(`Subscription status: ${status.reason}, creating new one...`);
-        
-        // Request permission if needed
         if (Notification.permission === 'default') {
           setShowPermissionButton(true);
           return;
         }
 
         if (Notification.permission !== 'granted') {
-          console.log('❌ Notification permission denied');
+          alert("Turn on notification access to receive notification")
           return;
         }
-
-        // Create new subscription
         await createNewSubscription(user.UserName);
       } else {
-        console.log('✅ Subscription is valid');
       }
 
     } catch (err) {
-      console.log("❌ Web Push setup error:", err);
     }
   };
 
-  async function clearOldSubscription() {
-    const registration = await navigator.serviceWorker.ready;
-    const existing = await registration.pushManager.getSubscription();
-
-    if (existing) {
-      console.log("Found old subscription → Unsubscribing...");
-      await existing.unsubscribe();
-    }
-  }
 
   useEffect(() => {
-    console.log('🚀 App mounted, setting up FCM...');
     setupWebPush();
   }, []);
     
