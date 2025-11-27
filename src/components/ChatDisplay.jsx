@@ -364,6 +364,7 @@ const ChatDisplay = (props) => {
 
     const reply = (msg) =>{
         setReplyMsg(()=>msg)
+        userPrompt.current.focus()
     }
     const closeReply = () =>{
         setReplyMsg(null)
@@ -404,6 +405,16 @@ const ChatDisplay = (props) => {
                     setMediaOption(()=>false)
                     setLoading(()=>false)
                     setMicShow(()=>true)
+                    sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                    const friendsList = props.mutualRender
+                    console.log(friendsList);
+                    const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                    const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                    console.log(getOtherFriend);
+                    
+                    if (getFriend && getFriend.length > 0) {
+                        props.setMutualRender([...getOtherFriend, getFriend[0]])
+                    }
                     set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                         user: userName
                     })
@@ -426,7 +437,6 @@ const ChatDisplay = (props) => {
                         if (result.exists()) {
                             friendNotifications = result.val()
                             friendNotifications.push(valueToPush)
-                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                 notifications : friendNotifications
                             })
@@ -434,7 +444,6 @@ const ChatDisplay = (props) => {
                         else{
                             friendNotifications = []
                             friendNotifications.push(valueToPush)
-                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                 notifications : friendNotifications
                             })
@@ -458,6 +467,16 @@ const ChatDisplay = (props) => {
                     setMediaOption(()=>false)
                     setLoading(()=>false)
                     setMicShow(()=>true)
+                    sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                    const friendsList = props.mutualRender
+                    console.log(friendsList);
+                    const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                    const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                    console.log(getOtherFriend);
+                    
+                    if (getFriend && getFriend.length > 0) {
+                        props.setMutualRender([...getOtherFriend, getFriend[0]])
+                    }
                     const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
                     let randomValue = ""
                     for (let index = 0; index < 12; index++) {
@@ -486,7 +505,6 @@ const ChatDisplay = (props) => {
                         if (result.exists()) {
                             friendNotifications = result.val()
                             friendNotifications.push(valueToPush)
-                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                 notifications : friendNotifications
                             })
@@ -494,7 +512,6 @@ const ChatDisplay = (props) => {
                         else{
                             friendNotifications = []
                             friendNotifications.push(valueToPush)
-                            sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                 notifications : friendNotifications
                             })
@@ -513,7 +530,7 @@ const ChatDisplay = (props) => {
             if(message){
                 get(ref(db, "Messages/"+props.chatInfo))
                 .then((output)=>{
-                    if(!output.val().chatArray || output.val().chatArray == "No message" || typeof(output.val().message) == "string"){
+                    if(!output.val()?.chatArray || output.val()?.chatArray == "No message" || typeof(output.val().message) == "string"){
                         setChatArray(prev=>[...prev, {[userName]:{
                             prompt:message,
                             progress: sending,
@@ -537,6 +554,16 @@ const ChatDisplay = (props) => {
                             setMediaOption(()=>false)
                             setLoading(()=>false)
                             setMicShow(()=>true)
+                            sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                            const friendsList = props.mutualRender
+                            console.log(friendsList);
+                            const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                            const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                            console.log(getOtherFriend);
+                            
+                            if (getFriend && getFriend.length > 0) {
+                                props.setMutualRender([...getOtherFriend, getFriend[0]])
+                            }
                             set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                                 user: userName
                             })
@@ -576,7 +603,6 @@ const ChatDisplay = (props) => {
                                     if (result.exists()) {
                                         friendNotifications = result.val()
                                         friendNotifications.push(valueToPush)
-                                        sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                                         update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                             notifications : friendNotifications
                                         })
@@ -584,7 +610,6 @@ const ChatDisplay = (props) => {
                                     else{
                                         friendNotifications = []
                                         friendNotifications.push(valueToPush)
-                                        sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                                         update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                             notifications : friendNotifications
                                         })
@@ -610,6 +635,16 @@ const ChatDisplay = (props) => {
                                 setMediaOption(()=>false)
                                 setLoading(()=>false)
                                 setMicShow(()=>true)
+                                sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                const friendsList = props.mutualRender
+                                console.log(friendsList);
+                                const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                                const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                                console.log(getOtherFriend);
+                                
+                                if (getFriend && getFriend.length > 0) {
+                                    props.setMutualRender([...getOtherFriend, getFriend[0]])
+                                }
                                 const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
                                 let randomValue = ""
                                 for (let index = 0; index < 12; index++) {
@@ -655,7 +690,6 @@ const ChatDisplay = (props) => {
                                         if (result.exists()) {
                                             friendNotifications = result.val()
                                             friendNotifications.push(valueToPush)
-                                            sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                                 notifications : friendNotifications
                                             })
@@ -663,7 +697,6 @@ const ChatDisplay = (props) => {
                                         else{
                                             friendNotifications = []
                                             friendNotifications.push(valueToPush)
-                                            sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                                             update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                                 notifications : friendNotifications
                                             })
@@ -730,6 +763,16 @@ const ChatDisplay = (props) => {
                         setDisplayMedia(()=>false)
                         setLoading(()=>false)   
                         setMicShow(()=>true)
+                        sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
+                        const friendsList = props.mutualRender
+                        console.log(friendsList);
+                        const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                        const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                        console.log(getOtherFriend);
+                        
+                        if (getFriend && getFriend.length > 0) {
+                            props.setMutualRender([...getOtherFriend, getFriend[0]])
+                        }
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
@@ -765,7 +808,6 @@ const ChatDisplay = (props) => {
                                 if (result.exists()) {
                                     friendNotifications = result.val()
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -773,7 +815,6 @@ const ChatDisplay = (props) => {
                                 else{
                                     friendNotifications = []
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -814,6 +855,16 @@ const ChatDisplay = (props) => {
                         setDisplayMedia(()=>false)
                         setLoading(()=>false)
                         setMicShow(()=>true)
+                        sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
+                        const friendsList = props.mutualRender
+                        console.log(friendsList);
+                        const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                        const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                        console.log(getOtherFriend);
+                        
+                        if (getFriend && getFriend.length > 0) {
+                            props.setMutualRender([...getOtherFriend, getFriend[0]])
+                        }
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
@@ -849,7 +900,6 @@ const ChatDisplay = (props) => {
                                 if (result.exists()) {
                                     friendNotifications = result.val()
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -857,7 +907,6 @@ const ChatDisplay = (props) => {
                                 else{
                                     friendNotifications = []
                                     friendNotifications.push(valueToPush)
-                                    sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                                     update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
                                         notifications : friendNotifications
                                     })
@@ -953,7 +1002,7 @@ const ChatDisplay = (props) => {
     const changeShowType = () =>{ 
         if(window.innerWidth <= 800){
             props.setChatState(()=>"sider")
-            props.setChatInfo(()=>null)
+            props.setChatInfo(()=>"")
             get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
             .then((output)=>{
                 let typingUsers = []

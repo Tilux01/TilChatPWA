@@ -44,7 +44,8 @@ function Home(props) {
   const [userName, setUserName] = useState()
   const [userCredentials, setUserCredentials] = useState([])
   const [chatState, setChatState] = useState("sider")
-  const [showPermissionButton, setShowPermissionButton] = useState(false) // ADD THIS LINE
+  const [showPermissionButton, setShowPermissionButton] = useState(false) 
+  const [mutualRender, setMutualRender] = useState([])
   
   useEffect(() => {
     if (window.innerWidth > 800) {
@@ -157,8 +158,8 @@ function Home(props) {
     
       return(
         <ViewStateContext.Provider value={props.ViewState}>
-          <SideComponents chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} setChatView={setChat} setChatInfo={setChatInfo} chatInfo={chatInfo} setChatFriendDetail={setChatFriendDetail} chatFriendDetail={chatFriendDetail} feedObject={feedObject} setFeedObject={setFeedObject}/>
-          {!chat?<View chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} iframeLink={props.iframeLink} setChatInfo={setChatInfo} feedObject={feedObject} setFeedObject={setFeedObject} setChat={setChat}/>:<ChatDisplay setChatState={setChatState} chatState={chatState} setChatInfo={setChatInfo} chatInfo={chatInfo} chatFriendDetail={chatFriendDetail}/>}
+          <SideComponents mutualRender={mutualRender} setMutualRender={setMutualRender} chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} setChatView={setChat} setChatInfo={setChatInfo} chatInfo={chatInfo} setChatFriendDetail={setChatFriendDetail} chatFriendDetail={chatFriendDetail} feedObject={feedObject} setFeedObject={setFeedObject}/>
+          {!chat?<View chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} iframeLink={props.iframeLink} setChatInfo={setChatInfo} feedObject={feedObject} setFeedObject={setFeedObject} setChat={setChat}/>:<ChatDisplay mutualRender={mutualRender} setMutualRender={setMutualRender} setChatState={setChatState} chatState={chatState} setChatInfo={setChatInfo} chatInfo={chatInfo} chatFriendDetail={chatFriendDetail}/>}
           {/* <FeedPreview/> */}
         </ViewStateContext.Provider>
       )

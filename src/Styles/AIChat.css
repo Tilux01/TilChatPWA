@@ -396,7 +396,16 @@ audio{
     /* background: blue; */
     filter: opacity(.8);
 }
-
+.unread{
+    width: 15px;
+    border-radius: 50%;
+    height: 15px;
+    background: #2176ff;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 20px;
+}
 
 @keyframes increase {
     0%{

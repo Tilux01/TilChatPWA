@@ -35,7 +35,6 @@ const db = getDatabase(app)
 const analytics = getAnalytics(app);
 
 const SideComponents = (props) => {
-    // This is the user status Array list, distributed to friends and userStatus component using props
     const navigate = useNavigate()
     let userName 
     const localData = JSON.parse(localStorage.getItem("TilChat"))
@@ -240,9 +239,7 @@ const SideComponents = (props) => {
         })
         }
 
-    // Get FriendsList
     const [mutualFriendsArray, setMutualFriendsArray] = useState([])
-    const [mutualRender, setMutualRender] = useState([])
     const [mutualRenderInverse, setMutualRenderInverse] = useState()
     const [chatSearchFilter, setChatSearchFilter] = useState([])
     
@@ -252,7 +249,7 @@ const SideComponents = (props) => {
         getChat("friendsList")
         .then((output) =>{
             if (output) {
-                setMutualRender(()=>output)
+                props.setMutualRender(()=>output)
                 const storageHold = output
                 const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
                 let holdData
@@ -270,7 +267,7 @@ const SideComponents = (props) => {
                             holdData.map((data, index) => {
                                 get(ref(db, `Users/${data}`))
                                 .then((output)=>{
-                                    setMutualRender(M=>[...M,output.val()])
+                                    props.setMutualRender(M=>[...M,output.val()])
                                 })
                             })
                         }
@@ -280,7 +277,7 @@ const SideComponents = (props) => {
                                 if (segmentFind.length == 0) {
                                     get(ref(db, `Users/${data}`))
                                     .then((output)=>{
-                                        setMutualRender(M=>[...M,output.val()])
+                                        props.setMutualRender(M=>[...M,output.val()])
                                     })
                                 }
                             })
@@ -305,7 +302,7 @@ const SideComponents = (props) => {
                         holdData?.map((data, index) => {
                             get(ref(db, `Users/${data}`))
                             .then((output)=>{
-                                setMutualRender(M=>[...M,output.val()])
+                                props.setMutualRender(M=>[...M,output.val()])
                             })
                         })
                     })
@@ -324,7 +321,7 @@ const SideComponents = (props) => {
                 holdData.map((data, index) => {
                     get(ref(db, `Users/${data}`))
                     .then((output)=>{
-                        setMutualRender(M=>[...M,output.val()])
+                        props.setMutualRender(M=>[...M,output.val()])
                     })
                 })
                 set(ref(db,`Users/${userNameLoc.UserName}/newFriends`),null)
@@ -336,31 +333,46 @@ const SideComponents = (props) => {
     const userNameLoc = JSON.parse(localStorage.getItem("TilChat"));
     
     onValue(ref(db, `Users/${userNameLoc?.UserName}/notifications`), (output) => {
-        if (output.exists()) {
-        const holdNotification = output.val();
-        
-        holdNotification.forEach((note) => {
-            if(props.chatInfo === userNameLoc.UserName+note.sender || 
-            props.chatInfo === note.sender+userNameLoc.UserName) {
-            return; 
-            }
-            
-            const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
-            const profilePic = senderImg?.profilePic || logo;
-        });
-        
-        set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
+            if (output.exists()) {
+            const holdNotification = output.val();
+            console.log(holdNotification);
+            set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
+            let arrayList = props.mutualRender
+            let checkArray = []
+            holdNotification.map((note) => {
+                console.log("note");
+                const filterNote = arrayList.filter(friend=> note.sender != friend?.UserName)
+                const senderNote = arrayList.filter(friend=> note.sender == friend?.UserName)
+                if (filterNote && filterNote.length > 0) {
+                    checkArray = filterNote
+                    const friend = senderNote[0]
+                    const pushFriend = friend
+                    pushFriend.unreadMsg = true
+                    checkArray.push(pushFriend)
+                    arrayList = checkArray
+                    console.log(arrayList);
+                    props.setMutualRender(()=>arrayList)
+                }
+                // if(props.chatInfo === userNameLoc.UserName+note.sender || 
+                // props.chatInfo === note.sender+userNameLoc.UserName) {
+                    // return; 
+                    // }
+                    
+                //     const senderImg = holdRender.current.find(friend => friend.UserName === note.sender);
+                // const profilePic = senderImg?.profilePic || logo;
+            })
         }
+        return
     });
-    }, []);
+    }, [props.mutualRender]);
 
     useEffect(() => {
-        setChatSearchFilter(mutualRender)
-        holdRender.current = mutualRender
-        if(mutualRender.length > 0){
-            saveChat("friendsList", mutualRender)
+        setChatSearchFilter(props.mutualRender)
+        holdRender.current = props.mutualRender
+        if(props.mutualRender.length > 0){
+            saveChat("friendsList", props.mutualRender)
         }
-    }, [mutualRender])
+    }, [props.mutualRender])
 
     const saveUserStatus = async(directory, data) =>{
         const cache = await caches.open('TilCache')
@@ -573,7 +585,7 @@ const SideComponents = (props) => {
         <div className='side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='chats-Parent-overall'>
-                <Chats setViewState={props.setViewState} setChatSearchFilter={setChatSearchFilter} chatSearchFilter={chatSearchFilter} setChatView={props.setChatView} setChatState={props.setChatState} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail} mutualRender={mutualRender} userCredentials={props.userCredentials}/>
+                <Chats setViewState={props.setViewState} setChatSearchFilter={setChatSearchFilter} chatSearchFilter={chatSearchFilter} setChatView={props.setChatView} setChatState={props.setChatState} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail} mutualRender={props.mutualRender} setMutualRender={props.setMutualRender} userCredentials={props.userCredentials}/>
             </div>
         </div>
       )
@@ -583,7 +595,7 @@ const SideComponents = (props) => {
         <div className='side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='chats-Parent-overall' >
-                <FriendsComponent mutualRenderInverse={mutualRenderInverse} mutualRender={mutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
+                <FriendsComponent mutualRenderInverse={mutualRenderInverse} mutualRender={props.mutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
             </div>
         </div>
       )

@@ -437,7 +437,7 @@ const FriendsComponent = (props) => {
                 }
                 {props.mutualRender != []?<h3 style={{marginTop:"15px",color:"whitesmoke",fontSize:"27px"}}>Friends</h3>:null}
                 {
-                    props.mutualRender.map((output, index) => {
+                    props.mutualRender.slice().reverse().map((output, index) => {
                         return (
                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
                                     <img src={output.profilePic} alt="" />

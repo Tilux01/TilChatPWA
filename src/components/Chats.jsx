@@ -42,6 +42,14 @@ const Chats = (props) => {
         if(window.innerWidth <= 800){
             props.setChatState(()=>"chat")
         }
+        
+        const allList = props.mutualRender
+        const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
+        console.log(userIndex);
+        props.setMutualRender(prev=>prev.map((data, i) =>
+            i == userIndex? {...data,unreadMsg: false} : data
+        ))
+        
         props.setChatFriendDetail(C=>output)
         props.setChatView(true)
         const Msg1 = output.UserName + props.userCredentials.UserName
@@ -107,7 +115,7 @@ const Chats = (props) => {
                         const findFriend = mutuals.find(friend=>
                             friend == output.UserName
                         )
-                        if(!findFriend){
+                        if(!findFriend || findFriend.length == 0){
                             mutuals.push(output.UserName)
                             update(ref(db, `Users/${props.userCredentials.UserName}/mutualFriends`),{
                                 mutualFriends: mutuals
@@ -158,12 +166,13 @@ const Chats = (props) => {
             </div>
             <div className="chats-parent">
                 {
-                    props.chatSearchFilter.map((output,index)=>(  
+                    props.chatSearchFilter.slice().reverse().map((output,index)=>(  
                         <div className='chat' key={index} onClick={()=>message(output)}>
                             <img src={output.profilePic} alt="" />
                             <div style={{display:"flex",flexDirection:"column"}}>
                                 <p>{output.FullName}</p>
                                 <small style={{color:'whitesmoke'}}>@{output.UserName}</small>
+                                {output.unreadMsg? <main className='unread'></main>: null}
                             </div>
                         </div>
                     ))
