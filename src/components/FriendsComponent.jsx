@@ -223,6 +223,12 @@ const FriendsComponent = (props) => {
         if(window.innerWidth <= 800){
             props.setChatState(()=>"chat")
         }
+        const allList = props.mutualRender
+        const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
+        console.log(userIndex);
+        props.setMutualRender(prev=>prev.map((data, i) =>
+            i == userIndex? {...data,unreadMsg: false} : data
+        ))
         props.setChatFriendDetail(C=>output)    
         props.setChatView(true)
         const Msg1 = output.UserName + userCredentials.UserName

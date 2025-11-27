@@ -595,7 +595,7 @@ const SideComponents = (props) => {
         <div className='side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='chats-Parent-overall' >
-                <FriendsComponent mutualRenderInverse={mutualRenderInverse} mutualRender={props.mutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
+                <FriendsComponent mutualRenderInverse={mutualRenderInverse} mutualRender={props.mutualRender} setMutualRender={props.setMutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
             </div>
         </div>
       )

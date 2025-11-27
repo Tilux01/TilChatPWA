@@ -65,6 +65,7 @@
     padding-right: 10px;
     height: 70vh;
     overflow-y: scroll;
+    transition: all 3s ease-out;
 }
 .chats-overall .chats-parent::-webkit-scrollbar{
     width: 2px;
