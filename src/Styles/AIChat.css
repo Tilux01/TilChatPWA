@@ -290,7 +290,8 @@ iframe{
     align-items: center;
     position: relative;
 }
-.view-overall .welcome-input input{
+.view-overall .welcome-input input,
+.view-overall .welcome-input textarea{
     width: 85%;
     padding: 17px;
     padding-left: 50px;
@@ -302,6 +303,18 @@ iframe{
     margin-top: 10px;
     outline: 0;
     border-radius: 20px;
+}
+.view-overall .welcome-input textarea{
+    min-height: 30px;
+    max-height: 50px;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-wrap: break-word;
+    padding: 0px 40px;
+    height: auto;
+    padding-top: 15px;
+    align-items: center;
+    display: flex;
 }
 .view-overall .welcome-input img{
     width: 27px;

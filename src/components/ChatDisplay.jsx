@@ -1147,7 +1147,7 @@ const ChatDisplay = (props) => {
                     </div>
                 : 
                     <div className="welcome-input">
-                        <input type="text" ref={userPrompt} id='userPromptDom' onChange={typing}/>
+                        <textarea autoComplete='on' rows="5" cols="30" autoCorrect='on' type="text" ref={userPrompt} id='userPromptDom' onChange={typing}/>
                         <img src={linkBtn} alt="" onClick={changeMediaOption}  className='addBtn'/>
                         {micShow? <img src={recordState} className={recordState == stopVoiceRecording? "recordingPauseBtn" : null} onClick={voiceNote} alt=""/> : <img src={send} onClick={sendChat} alt=""/>}
                     </div>
