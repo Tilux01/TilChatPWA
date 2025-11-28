@@ -38,13 +38,37 @@ const Chats = (props) => {
             props.setChatSearchFilter(props.mutualRender.filter((friend)=>friend.UserName?.includes(values.toLowerCase()) || friend.FullName?.includes(values.toLowerCase())))
         }
     }
+    const openDB = () => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('TilDB', 1)
+
+            request.onupgradeneeded = (event) => {
+            const db = event.target.result
+            if (!db.objectStoreNames.contains('chats')) {
+                db.createObjectStore('chats')
+            }
+            }
+
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
+        })
+    }
+    const getChat = async(key) =>{
+        const db = await openDB()
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('chats', 'readonly')
+            const store = tx.objectStore('chats')
+            const request = store.get(key)
+            request.onsuccess = () => resolve(request.result || null)
+            request.onerror = () => reject(request.error)
+        })
+    }
     const message = (output) =>{
         if(window.innerWidth <= 800){
             props.setChatState(()=>"chat")
         }
         const allList = props.mutualRender
         const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
-        console.log(userIndex);
         props.setMutualRender(prev=>prev.map((data, i) =>
             i == userIndex? {...data,unreadMsg: false} : data
         ))
@@ -52,11 +76,25 @@ const Chats = (props) => {
         props.setChatView(true)
         const Msg1 = output.UserName + props.userCredentials.UserName
         const Msg2 = props.userCredentials.UserName + output.UserName
-        console.log(Msg1, Msg2);
-        
         let Msg;
         let message1;
         let message2;
+        getChat(Msg1)
+        .then((output)=>{
+            if (output) {
+                props.setChatInfo(()=>Msg1)
+            }
+            else {
+                getChat(Msg2)
+                .then((output2)=>{
+                    if (output2) {
+                        props.setChatInfo(()=>Msg2)
+                    }
+                })
+            }
+        })
+        console.log("it got here");
+        
         get(ref(db,`Messages/${Msg1}`))
         .then((output1)=>{
             if(output1.exists()){

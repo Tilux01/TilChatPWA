@@ -197,39 +197,39 @@ const ChatDisplay = (props) => {
     const [chatArray, setChatArray] = useState([])
     const propsValue = useRef()
     const openDB = () => {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('TilDB', 1)
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('TilDB', 1)
 
-        request.onupgradeneeded = (event) => {
-        const db = event.target.result
-        if (!db.objectStoreNames.contains('chats')) {
-            db.createObjectStore('chats')
-        }
-        }
+            request.onupgradeneeded = (event) => {
+            const db = event.target.result
+            if (!db.objectStoreNames.contains('chats')) {
+                db.createObjectStore('chats')
+            }
+            }
 
-        request.onsuccess = () => resolve(request.result)
-        request.onerror = () => reject(request.error)
-    })
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
+        })
     }
     const  saveChat = async(directory, data) => {
     const db = await openDB()
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('chats', 'readwrite')
-        const store = tx.objectStore('chats')
-        store.put(data, directory)
-        tx.oncomplete = () => resolve(true)
-        tx.onerror = () => reject(tx.error)
-    })
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('chats', 'readwrite')
+            const store = tx.objectStore('chats')
+            store.put(data, directory)
+            tx.oncomplete = () => resolve(true)
+            tx.onerror = () => reject(tx.error)
+        })
     }
     const getChat = async(key) =>{
-    const db = await openDB()
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction('chats', 'readonly')
-        const store = tx.objectStore('chats')
-        const request = store.get(key)
-        request.onsuccess = () => resolve(request.result || null)
-        request.onerror = () => reject(request.error)
-    })
+        const db = await openDB()
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('chats', 'readonly')
+            const store = tx.objectStore('chats')
+            const request = store.get(key)
+            request.onsuccess = () => resolve(request.result || null)
+            request.onerror = () => reject(request.error)
+        })
     }
 
     useEffect(() => {
@@ -946,6 +946,7 @@ const ChatDisplay = (props) => {
                 setDisplayMedia(()=>true)
                 setMediaFileName(()=>file.name)
             }
+            
             else{
                 alert("Invalid media type")
             }

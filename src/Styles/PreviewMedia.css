@@ -36,7 +36,7 @@
     transition: all 0.5s;
 
 }
-.PreviewMedia .option{
+.PreviewMedia .moreOption{
     filter: invert(1);
     width: 35px;
     height: 35px;
@@ -52,7 +52,36 @@
 .PreviewMedia .option:hover{
     background: rgba(31, 30, 30, 0.151);
 }
-.PreviewMedia .select{
+.PreviewMedia .optionList{
     position: absolute;
-    right: 7px;
+    color: whitesmoke;
+    right: 10px;
+    top: 45px;
+    background: hsl(0, 0%, 6%);
+    width: 100px;
+    height: auto;
+    padding: 5px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+.PreviewMedia .optionList .option{
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+}
+.PreviewMedia .optionList .option:hover,
+.PreviewMedia .optionList .option:active,
+.PreviewMedia .optionList .option:focus{
+    background:rgba(128, 128, 128, 0.11);;
+}
+.PreviewMedia .optionList .option p{
+    font-weight: 600;
+    color: whitesmoke !important;
+    font-size: 14px;
+    width: 100%;
+    height: 100%;
 }
