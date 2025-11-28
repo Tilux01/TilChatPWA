@@ -52,6 +52,8 @@ const Chats = (props) => {
         props.setChatView(true)
         const Msg1 = output.UserName + props.userCredentials.UserName
         const Msg2 = props.userCredentials.UserName + output.UserName
+        console.log(Msg1, Msg2);
+        
         let Msg;
         let message1;
         let message2;
@@ -60,72 +62,74 @@ const Chats = (props) => {
             if(output1.exists()){
                 message1 = Msg1
             }
-        }) 
-        get(ref(db,`Messages/${Msg2}`))
-        .then((output2)=>{
-            if (output2.exists()) {
-                message2 = Msg2
-            }
         })
         .finally(()=>{
-            if(!message1 && !message2){
-                update(ref(db, `Messages/${Msg1}`),{
-                    message:"hello"
-                })
-                .then(()=>{
-                    props.setChatInfo(M=>Msg1)
-                    let mutuals = []
-                    let friendMutuals = []
-                    get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
-                    .then((data)=>{
-                        if(data.exists()){
+            get(ref(db,`Messages/${Msg2}`))
+            .then((output2)=>{
+                if (output2.exists()) {
+                    message2 = Msg2
+                }
+            })
+            .finally(()=>{
+                if(!message1 && !message2){
+                    update(ref(db, `Messages/${Msg1}`),{
+                        message:"hello"
+                    })
+                    .then(()=>{
+                        props.setChatInfo(M=>Msg1)
+                        let mutuals = []
+                        let friendMutuals = []
+                        get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
+                        .then((data)=>{
+                            if(data.exists()){
+                                mutuals = data.val()
+                            }
+                            if(!(mutuals?.includes(output.UserName))){
+                                mutuals.push(output.UserName)
+                                update(ref(db, `Users/${props.userCredentials.UserName}`),{
+                                    mutualFriends: mutuals
+                                })
+                            }
+                        })
+                        get(ref(db,`Users/${output.UserName}/mutualFriends`))
+                        .then((data)=>{
+                            if(data.exists()){
+                                friendMutuals = data.val()
+                            } 
+                            if(!(friendMutuals?.includes(output.UserName))){
+                                friendMutuals.push(props.userCredentials.UserName)
+                                update(ref(db, `Users/${output.UserName}`),{
+                                    mutualFriends: friendMutuals
+                                })
+                            }
+                        })
+                    })
+                }
+                else{
+                    if(message1){
+                        props.setChatInfo(M=>message1)
+                        let mutuals;
+                        let friendMutual;
+                        get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
+                        .then((data)=>{
                             mutuals = data.val()
-                        }
-                        if(!(mutuals?.includes(output.UserName))){
-                            mutuals.push(output.UserName)
-                            update(ref(db, `Users/${props.userCredentials.UserName}`),{
-                                mutualFriends: mutuals
-                            })
-                        }
-                    })
-                    get(ref(db,`Users/${output.UserName}/mutualFriends`))
-                    .then((data)=>{
-                        if(data.exists()){
-                            friendMutuals = data.val()
-                        } 
-                        if(!(friendMutuals?.includes(output.UserName))){
-                            friendMutuals.push(props.userCredentials.UserName)
-                            update(ref(db, `Users/${output.UserName}`),{
-                                mutualFriends: friendMutuals
-                            })
-                        }
-                    })
-                })
-            }
-            else{
-                if(message1){
-                    props.setChatInfo(M=>message1)
-                    let mutuals;
-                    let friendMutual;
-                    get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
-                    .then((data)=>{
-                        mutuals = data.val()
-                        const findFriend = mutuals.find(friend=>
-                            friend == output.UserName
-                        )
-                        if(!findFriend || findFriend.length == 0){
-                            mutuals.push(output.UserName)
-                            update(ref(db, `Users/${props.userCredentials.UserName}/mutualFriends`),{
-                                mutualFriends: mutuals
-                            })
-                        }
-                    })
+                            const findFriend = mutuals.find(friend=>
+                                friend == output.UserName
+                            )
+                            if(!findFriend || findFriend.length == 0){
+                                mutuals.push(output.UserName)
+                                update(ref(db, `Users/${props.userCredentials.UserName}/mutualFriends`),{
+                                    mutualFriends: mutuals
+                                })
+                            }
+                        })
+                    }
+                    else if(message2){
+                        props.setChatInfo(M=>message2)
+                    }
                 }
-                else if(message2){
-                    props.setChatInfo(M=>message2)
-                }
-            }
-        })
+            })
+        }) 
     }
     const [moreOption, setMoreOption] = useState(null)
     const openMoreOption =() =>{

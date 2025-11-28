@@ -65,14 +65,8 @@ function Home(props) {
   }, [navigate])
 
   useEffect(() => {
-    if(userNameGet){
-      const user = JSON.parse(userNameGet).UserName
-      onValue(ref(db, `Users/${user}/onlineCheck`), (result)=>{
-        if (result.val()) {
-          set(ref(db, `Users/${user}/onlineCheck`), null)
-        }
-      })
-    }
+    const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
+    setUserCredentials(userNameLoc)
   }, [])
 
   useEffect(() => {
@@ -81,8 +75,20 @@ function Home(props) {
     .then((output)=>{
       if(output.exists()){
         setUserCredentials(output.val())
+        localStorage.setItem("TilChat",JSON.stringify({UserName: output.val().UserName,uniqueId: output.val().uniqueId,profileId: output.val().profileId, profilePic:output.val().profilePic}))
       }
     })
+  }, [])
+
+  useEffect(() => {
+    if(userNameGet){
+      const user = JSON.parse(userNameGet).UserName
+      onValue(ref(db, `Users/${user}/onlineCheck`), (result)=>{
+        if (result.val()) {
+          set(ref(db, `Users/${user}/onlineCheck`), null)
+        }
+      })
+    }
   }, [])
 
   const checkSubscriptionStatus = async (userId) => {

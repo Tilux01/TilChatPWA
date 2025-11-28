@@ -36,3 +36,23 @@
     transition: all 0.5s;
 
 }
+.PreviewMedia .option{
+    filter: invert(1);
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: 5px;
+    z-index: 2;
+    right: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.5s;
+    padding: 5px;
+}   
+.PreviewMedia .option:hover{
+    background: rgba(31, 30, 30, 0.151);
+}
+.PreviewMedia .select{
+    position: absolute;
+    right: 7px;
+}

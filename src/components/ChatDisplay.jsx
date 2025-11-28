@@ -289,7 +289,7 @@ const ChatDisplay = (props) => {
                     update(ref(db, `Users/${userName}/type`),{
                         type: checkFriendTyping
                     })
-                }, 20000);
+                }, 3000);
             }
             else{
                 setFriendTyping(()=>false)
@@ -363,7 +363,9 @@ const ChatDisplay = (props) => {
     }, [props.chatFriendDetail.UserName, userName])
 
     const reply = (msg) =>{
-        setReplyMsg(()=>msg)
+        if (msg && msg != "") {
+            setReplyMsg(()=>msg)
+        }
         userPrompt.current.focus()
     }
     const closeReply = () =>{

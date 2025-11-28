@@ -195,7 +195,7 @@ const SignUp = () => {
                   }
                 })
                 
-                localStorage.setItem("TilChat",JSON.stringify({UserName,uniqueId,profileId}))
+                localStorage.setItem("TilChat",JSON.stringify({UserName,uniqueId,profileId, profilePic}))
                 alert("welcome " + UserName)
                 navigate("/")
               } catch (error) {

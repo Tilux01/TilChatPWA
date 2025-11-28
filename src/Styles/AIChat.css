@@ -316,6 +316,9 @@ iframe{
     align-items: center;
     display: flex;
 }
+.view-overall .welcome-input textarea::-webkit-scrollbar{
+    display: none;
+}
 .view-overall .welcome-input img{
     width: 27px;
     position: absolute;
