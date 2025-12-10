@@ -205,6 +205,10 @@ const SignUp = () => {
             }
       }
     }
+
+    const login = () =>{
+      navigate("/signin")
+    }
   return (
     <div className='signup-parent'>
       <div className="sign-overall">
@@ -240,6 +244,7 @@ const SignUp = () => {
               <input onChange={checkFemale} type="checkbox" id='male'/>
             </div>
             <button onClick={changeInfo}>Proceed</button>
+            <h6 onClick={login} style={{color:"blue", cursor:"pointer"}}>Already have an account? sign in</h6>
           </div>
         ):(
           <div className="form lastInfo">
