@@ -207,6 +207,7 @@ const SignUp = () => {
     }
 
     const login = () =>{
+      localStorage.setItem("TilChat",JSON.stringify({UserName: "New",uniqueId: "123",profileId: "123", profilePic:"p"}))
       navigate("/signin")
     }
   return (
