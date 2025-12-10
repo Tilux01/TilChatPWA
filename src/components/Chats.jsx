@@ -64,8 +64,8 @@ const Chats = (props) => {
         })
     }
     const message = (output) =>{
-        if(window.innerWidth <= 800){
-            props.setChatState(()=>"chat")
+        if (!props.userCredentials || !props.userCredentials.UserName) {
+            return
         }
         const allList = props.mutualRender
         const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
@@ -81,20 +81,23 @@ const Chats = (props) => {
         let message2;
         getChat(Msg1)
         .then((output)=>{
-            if (output) {
-                props.setChatInfo(()=>Msg1)
-            }
-            else {
-                getChat(Msg2)
-                .then((output2)=>{
-                    if (output2) {
-                        props.setChatInfo(()=>Msg2)
-                    }
-                })
+            if (output != props.chatInfo) {
+                if (output) {
+                    props.setChatInfo(()=>Msg1)
+                }
+                else {
+                    getChat(Msg2)
+                    .then((output2)=>{
+                        if (output2) {
+                            props.setChatInfo(()=>Msg2)
+                        }
+                    })
+                }
             }
         })
-        console.log("it got here");
-        
+        if(window.innerWidth <= 800){
+            props.setChatState(()=>"chat")
+        }
         get(ref(db,`Messages/${Msg1}`))
         .then((output1)=>{
             if(output1.exists()){

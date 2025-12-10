@@ -7,7 +7,7 @@ import send from "../images/paper-plane.png"
 import "../Styles/AIChat.css"
 import { ViewStateContext } from '../App'
 import axios from 'axios'
-// import { GoogleGenAI } from "https://esm.run/@google/genai";
+import { GoogleGenAI } from '@google/genai';
 
 const WelcomeComponent = ()=>{
     return(
@@ -73,31 +73,31 @@ const AIComponent = (props) => {
 
     const query = async() =>{
         setUserPrompt("")
-        // const ai = new GoogleGenAI({
-        //     apiKey: apiKeys.current[currentKeyIndex.current]
-        // });
+        const ai = new GoogleGenAI({
+            apiKey: apiKeys.current[currentKeyIndex.current]
+        });
         
-        // setIsLoading(true);
-        // try {
-        //     const result = await ai.models.generateContent({
-        //         model: "gemini-2.0-flash-lite",
-        //         contents: userPrompt
-        //     });
-        //     setChatArray(C=>[...C,{Text:result.text,className:"response"}])
-        // }
-        // catch (error){
-        //     if(currentKeyIndex.current >= apiKeys.current.length-1){
-        //         setChatArray(C=>[...C,{Text:"Server Error, pls try again later",className:"response"}])
-        //     }
-        //     else{
-        //         console.error("Gemini Error:", error);
-        //         currentKeyIndex.current = currentKeyIndex.current + 1
-        //         query()
-        //     }
-        // } 
-        // finally {
-        //     setIsLoading(false);
-        // }
+        setIsLoading(true);
+        try {
+            const result = await ai.models.generateContent({
+                model: "gemini-2.0-flash-lite",
+                contents: userPrompt
+            });
+            setChatArray(C=>[...C,{Text:result.text,className:"response"}])
+        }
+        catch (error){
+            if(currentKeyIndex.current >= apiKeys.current.length-1){
+                setChatArray(C=>[...C,{Text:"Server Error, pls try again later",className:"response"}])
+            }
+            else{
+                console.error("Gemini Error:", error);
+                currentKeyIndex.current = currentKeyIndex.current + 1
+                query()
+            }
+        } 
+        finally {
+            setIsLoading(false);
+        }
     }
 
     const sendQuery = () =>{

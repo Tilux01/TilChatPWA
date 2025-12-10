@@ -33,6 +33,8 @@ import seen from "../images/double-tick (1).png"
 import close from "../images/ad6f8ce5-b6ba-4bde-b4af-a6d0b3db434c.png"
 import recordVoice from "../images/mic.png"
 import stopVoiceRecording from "../images/stop-button.png"
+import {reduceMediaQualityToFile, formatBytes} from "../fileReducer.js"
+
 
 
 const firebaseConfig = {
@@ -79,6 +81,7 @@ const ChatDisplay = (props) => {
     const [recordState, setRecordState] = useState(recordVoice)
     const [voiceNoteSrc, setVoiceNoteSrc] = useState()
     const [voicePreviewState, setVoicePreviewState] = useState(pauseBtn)
+    const [replyMsgCon, setReplyMsgCon] = useState()
     const audioTag = useRef("")
     const vnData = useRef()
     
@@ -182,7 +185,7 @@ const ChatDisplay = (props) => {
     }
     const scrollChat = useRef(null)
     const scrollToBottom = () => {
-        scrollChat.current?.scrollIntoView({ behavior: "smooth" })
+        scrollChat.current?.scrollIntoView({ behavior: "auto",block:"nearest", inline:"start" })
     };
     const userNameGet = localStorage.getItem("TilChat")
     useEffect(() => {
@@ -362,14 +365,28 @@ const ChatDisplay = (props) => {
         return checkOnline
     }, [props.chatFriendDetail.UserName, userName])
 
-    const reply = (msg) =>{
-        if (msg && msg != "") {
-            setReplyMsg(()=>msg)
+    const reply = (id, user) =>{
+        console.log(id, user);
+        
+        if (id && id != "") {
+            const filterChat = chatArray.filter(friend => friend[user]?.id == id)
+            if (filterChat && filterChat.length > 0) {
+                console.log(filterChat[0][user]);
+                setReplyMsgCon(()=>filterChat[0][user])
+                const check = {
+                    id : filterChat[0][user].id,
+                    user : user
+                }
+                console.log(check);
+                
+                setReplyMsg(()=>check)
+            }
         }
         userPrompt.current.focus()
     }
     const closeReply = () =>{
         setReplyMsg(null)
+        setReplyMsgCon(null)
     }
 
     const sendToNodeServer = async (recipientUserId, senderUserName, message) => {
@@ -387,19 +404,34 @@ const ChatDisplay = (props) => {
         }
     };
 
+    const randomGenerate = () =>{
+        const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
+        let randomValue = ""
+        for (let index = 0; index < 20; index++) {
+            const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+            randomValue = randomValue + generateRandom
+        }
+        return randomValue
+    }
+
     const sendVN = () =>{
         get(ref(db, "Messages/"+props.chatInfo))
         .then((output)=>{
+            const random = randomGenerate()
+            const id = `${userName}${random}`
             if(!output.val().chatArray || output.val().chatArray == "No message" || typeof(output.val().message) == "string"){
+                
                 setChatArray(prev=>[...prev, {[userName]:{
                     voiceNote: vnData.current,
                     progress: sending,
                     reply:replyMsg,
+                    id
                 }}])
                 set(ref(db,"Messages/"+props.chatInfo),{
                     chatArray: [{[userName]:{
                         voiceNote: vnData.current,
                         reply:replyMsg,
+                        id
                     }}]
                 })
                 .then(()=>{
@@ -425,6 +457,7 @@ const ChatDisplay = (props) => {
                         voiceNote: vnData.current,
                         progress: sent,
                         reply:replyMsg,
+                        id
                     }}])
                 })
                 .finally(()=>{
@@ -455,11 +488,16 @@ const ChatDisplay = (props) => {
             }
             else{
                 let tempData = output.val().chatArray
-                tempData.push({[userName]:{voiceNote: vnData.current,reply:replyMsg,}})
+                tempData.push({[userName]:{
+                    voiceNote: vnData.current,
+                    reply:replyMsg,
+                    id
+                }})
                 setChatArray(prev=>[...prev, {[userName]:{
                     voiceNote: vnData.current,
                     progress: sending,
-                    reply:replyMsg
+                    reply:replyMsg,
+                    id
                 }}])
                 set(ref(db,"Messages/"+props.chatInfo),{
                     chatArray: tempData
@@ -492,7 +530,8 @@ const ChatDisplay = (props) => {
                     setChatArray(prev=>[...prev, {[userName]:{
                         voiceNote: vnData.current,
                         progress: sent,
-                        reply:replyMsg
+                        reply:replyMsg,
+                        id
                     }}])
                 })
                 .finally(()=>{
@@ -502,7 +541,7 @@ const ChatDisplay = (props) => {
                         const valueToPush = {
                             prompt: `${userName} sent you a voice note`,
                             sender: userName,
-                            reply:replyMsg,
+                            reply:replyMsg
                         }
                         if (result.exists()) {
                             friendNotifications = result.val()
@@ -525,6 +564,8 @@ const ChatDisplay = (props) => {
     }
 
     const sendChat = () =>{
+        const random = randomGenerate()
+        const id = `${userName}${random}`
         if (!loading) {
             setReplyMsg(()=>null)
             setLoading(()=>true)
@@ -540,6 +581,7 @@ const ChatDisplay = (props) => {
                             mediaType: null,
                             mediaLink: null,
                             reply:replyMsg,
+                            id
                         }}])
                         set(ref(db,"Messages/"+props.chatInfo),{
                             chatArray: [{[userName]:{
@@ -548,6 +590,7 @@ const ChatDisplay = (props) => {
                                 mediaType: null,
                                 mediaLink: null,
                                 reply:replyMsg,
+                                id
                             }}]
                         })
                         .then(()=>{
@@ -577,6 +620,7 @@ const ChatDisplay = (props) => {
                                 mediaType: null,
                                 mediaLink: null,
                                 reply:replyMsg,
+                                id
                             }}])
                         })
                         .finally(()=>{
@@ -622,11 +666,16 @@ const ChatDisplay = (props) => {
                     }
                     else{
                             let tempData = output.val().chatArray
-                            tempData.push({[userName]:{prompt:userPrompt.current.value,reply:replyMsg}})
+                            tempData.push({[userName]:{
+                                prompt:userPrompt.current.value,
+                                reply:replyMsg,
+                                id
+                            }})
                             setChatArray(prev=>[...prev, {[userName]:{
                                 prompt:userPrompt.current.value,
                                 progress: sending,
-                                reply:replyMsg
+                                reply:replyMsg,
+                                id
                             }}])
                             set(ref(db,"Messages/"+props.chatInfo),{
                                 chatArray: tempData
@@ -663,7 +712,8 @@ const ChatDisplay = (props) => {
                                     media: null,
                                     mediaType: null,
                                     mediaLink: null,
-                                    reply:replyMsg
+                                    reply:replyMsg,
+                                    id
                                 }}])
                             })
                             .finally(()=>{
@@ -713,6 +763,8 @@ const ChatDisplay = (props) => {
         }
     }
     const sendMediaChat = () =>{
+        const random = randomGenerate()
+        const id = `${userName}${random}`
         if (!loading) {
             setReplyMsg(()=>null)
             setMicShow(()=>true)
@@ -742,7 +794,8 @@ const ChatDisplay = (props) => {
                             progress: sending,
                             media: displayUrl,
                             mediaType: mediaType,
-                            reply:replyMsg  
+                            reply:replyMsg,
+                            id  
                     }}])
                     const randoms = "abcdefghijklmnA1234567890BCDOELQPMLS"
                     const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
@@ -756,7 +809,8 @@ const ChatDisplay = (props) => {
                             prompt:message,
                             mediaLink: randomValue,
                             mediaType: mediaType,
-                            reply:replyMsg
+                            reply:replyMsg,
+                            id
                         }}]
                     })
                     .then(()=>{
@@ -784,7 +838,8 @@ const ChatDisplay = (props) => {
                             prompt:message,
                             media: displayUrl,
                             mediaType: mediaType,
-                            reply:replyMsg
+                            reply:replyMsg,
+                            id
                         }}])
                     })
                     .finally(()=>{
@@ -834,7 +889,8 @@ const ChatDisplay = (props) => {
                         media: displayUrl,
                         progress: sending,
                         mediaType: mediaType,
-                        reply:replyMsg
+                        reply:replyMsg,
+                        id
                     }}])
                     for (let index = 0; index < dataParticlesCollection.length; index++) {
                         set(ref(db, `Media/${randomValue}/${[index]}`),{
@@ -846,7 +902,8 @@ const ChatDisplay = (props) => {
                         progress: sending,
                         mediaLink: randomValue,
                         mediaType: mediaType,
-                        reply:replyMsg
+                        reply:replyMsg,
+                        id
                     }})
                     set(ref(db,"Messages/"+props.chatInfo),{
                         chatArray: tempData
@@ -876,7 +933,8 @@ const ChatDisplay = (props) => {
                             prompt:message,
                             mediaType: mediaType,
                             media: displayUrl,
-                            reply: replyMsg
+                            reply: replyMsg,
+                            id
                         }}])
                     })
                     .finally(()=>{
@@ -929,29 +987,44 @@ const ChatDisplay = (props) => {
             setMediaOption(()=>true)
         }
     }
-    const displayGallery = (e) =>{
+    const displayGallery = async(e) =>{
         const file = e.target.files[0]
-        let reader = new FileReader
-        reader.addEventListener("load", (e)=>{
-            const bufferResult = e.target.result
-            const uint8Array = new Uint8Array(bufferResult)
-            setDisplayUrl(()=>uint8Array)
-            if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
-                setMediaType(()=>"image")
-                setDisplayMedia(()=>true)
-                setMediaFileName(()=>file.name)
-            }
-            else if (file.type == "video/mp4") {
-                setMediaType(()=>"video")
-                setDisplayMedia(()=>true)
-                setMediaFileName(()=>file.name)
-            }
-            
-            else{
-                alert("Invalid media type")
-            }
+        console.log(file);
+        if (file.type > 5000000) {
+            alert("file size it too big")
+            return
+        }
+        
+        try {
+            const result = await reduceMediaQualityToFile(file, 0.7, 800);
+            let reader = new FileReader
+            reader.addEventListener("load", (e)=>{
+                const bufferResult = e.target.result
+                const uint8Array = new Uint8Array(bufferResult)
+                console.log("here");
+                
+                setDisplayUrl(()=>uint8Array)
+                if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
+                    setMediaType(()=>"image")
+                    setDisplayMedia(()=>true)
+                    setMediaFileName(()=>file.name)
+                }
+                else if (file.type == "video/mp4") {
+                    setMediaType(()=>"video")
+                    setDisplayMedia(()=>true)
+                    setMediaFileName(()=>file.name)
+                }
+                
+                else{
+                    alert("Invalid media type")
+                }
         })
-        reader.readAsArrayBuffer(file)
+        reader.readAsArrayBuffer(result.file)
+        } catch (error) {
+            console.log(error);
+            
+        }
+        
      } 
     const documentUpload = (e) =>{
         const file = e.target.files[0]
@@ -1019,8 +1092,42 @@ const ChatDisplay = (props) => {
             })
         }
     }
+
+    const ReplyComponent = ({id, user}) =>{
+        if (id && user) {
+            const filterChat = chatArray.filter(friend => friend[user]?.id == id)
+            if (filterChat && filterChat.length > 0) {
+                // console.log(filterChat[0][user]);
+                return(
+                    <div className='repliedMsg' disabled onClick={()=>{locateReply(id)}}>
+                        <div className='mediaParent'>
+                            {filterChat[0][user]?.media? 
+                                <div className='mediaPrev' disabled>
+                                    <MediaTypesSelect type={filterChat[0][user].mediaType} data={filterChat[0][user].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                </div>
+                            :null}
+                            <h5>{filterChat[0][user]?.prompt}</h5>
+                        </div>
+                        {filterChat[0][user].voiceNote? <audio src={filterChat[0][user].voiceNote} controls></audio> : null}
+                    </div>
+                )
+            }
+        }
+    }
+
+    const locateReply = (id) =>{
+        console.log('kkk');
+        
+        const element = document.getElementById(id)
+        element.scrollIntoView({ behavior: "auto",block:"nearest", inline:"start" })
+        element.style.background = "#36323273"
+        setTimeout(() => {
+        element.style.background = ""
+        }, 1000);
+    }
+
     return (
-        <main style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"100%"}}>
+        <main className='main-overall' style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"calc(100% - 00px)"}}>
             {displayMedia?
                 <ChatMediaSend displayUrl={displayUrl} setDisplayMedia={setDisplayMedia} mediaType={mediaType} sendMediaChat={sendMediaChat} setCollectInputTemp={setCollectInputTemp} collectInputTemp={collectInputTemp} loading={loading}/>:
                 <div className='view-overall'>
@@ -1046,9 +1153,9 @@ const ChatDisplay = (props) => {
                                     if(output){
                                         if (Object.keys(output)[0] == userName) {
                                             return(
-                                                <div className='request chat-request' key={index}>
+                                                <div className='request chat-request' key={index} id={output[`${userName}`]?.id? output[`${userName}`]?.id : ""} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} draggable>
                                                     <main>
-                                                        {output[`${userName}`]?.reply? (<h5 className='repliedMsg'>{output[`${userName}`].reply}</h5>) : null}
+                                                        {output[`${userName}`]?.reply? <ReplyComponent id={output[`${userName}`]?.reply.id} user={output[`${userName}`]?.reply?.user}/>: null}
                                                         <MediaTypesSelect type={output[`${userName}`].mediaType} data={output[`${userName}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
                                                         <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${userName}`].voiceNote} statusPreview={statusPreview}/>
                                                         <p>{output[`${userName}`].prompt}<img src={output[`${userName}`].progress} alt="" className='progress'/></p>
@@ -1058,9 +1165,9 @@ const ChatDisplay = (props) => {
                                         }
                                         else{
                                             return(
-                                                <div className='response chat-response' key={index} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].prompt)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].prompt)}} draggable>
+                                                <div className='response chat-response' key={index} id={output[`${Object.keys(output)[0]}`]?.id? output[`${Object.keys(output)[0]}`]?.id : ""} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} draggable>
                                                     <main>
-                                                        {output[`${Object.keys(output)[0]}`]?.reply? (<h5 className='repliedMsg'>{output[`${Object.keys(output)[0]}`].reply}</h5>) : null}
+                                                        {output[`${Object.keys(output)[0]}`]?.reply? (<ReplyComponent id={output[`${Object.keys(output)[0]}`]?.reply?.id} user={output[`${Object.keys(output)[0]}`]?.reply?.user}/>) : null}
                                                         <MediaTypesSelect type={output[`${Object.keys(output)[0]}`].mediaType} data={output[`${Object.keys(output)[0]}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
                                                         <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${Object.keys(output)[0]}`].voiceNote} statusPreview={statusPreview}/>
                                                         <p>{output[`${Object.keys(output)[0]}`].prompt}</p>
@@ -1086,10 +1193,26 @@ const ChatDisplay = (props) => {
                                     :null
                                 }
                             </div>
-                            <section ref={scrollChat}></section>
+                            <div>
+                                <section ref={scrollChat}></section>
+                            </div>
                         </div>
                     </div>
-                    {replyMsg? <div className='replyMsg'><h5>{replyMsg}</h5><img src={close} onClick={closeReply} alt="" /></div>: null}
+                    {replyMsgCon? 
+                    <div className='replyMsg' disabled>
+                        <div className='mediaParent'>
+                            {replyMsgCon?.media? 
+                                <div className='mediaPrev'>
+                                    <MediaTypesSelect type={replyMsgCon.mediaType} data={replyMsgCon.media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                </div>
+                            :null}
+                            <h5>{replyMsgCon?.prompt}</h5>
+                        </div>
+                        {replyMsgCon.voiceNote? <audio src={replyMsgCon.voiceNote} controls></audio> : null}
+                        
+                        <img src={close} onClick={closeReply} alt="" className='closeImg' />
+                    </div>
+                : null}
                 </div>
                 {
                     mediaOption?
@@ -1141,6 +1264,7 @@ const ChatDisplay = (props) => {
                     </div>:
                     null
                 }
+                
                 <audio src={voiceNoteSrc} ref={audioTag} autoPlay style={{display:"none"}} onEnded={()=>setVoicePreviewState(playBtn)}></audio>
                 {voiceNoteSrc? 
                     <div className="voiceNote">
