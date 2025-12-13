@@ -35,7 +35,7 @@ const Chats = (props) => {
             props.setChatSearchFilter(props.mutualRender)
         }
         else{
-            props.setChatSearchFilter(props.mutualRender.filter((friend)=>friend.UserName?.includes(values.toLowerCase()) || friend.FullName?.includes(values.toLowerCase())))
+            props.setChatSearchFilter(props.mutualRender.filter((friend)=>friend.UserName?.includes(values.toLowerCase()) || friend?.FullName?.includes(values.toLowerCase())))
         }
     }
     const openDB = () => {
@@ -64,18 +64,18 @@ const Chats = (props) => {
         })
     }
     const message = (output) =>{
-        if (!props.userCredentials || !props.userCredentials.UserName) {
+        if (!props.userCredentials || !props.userCredentials?.UserName) {
             return
         }
         const allList = props.mutualRender
-        const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
+        const userIndex = allList.findIndex(friend=> friend?.UserName == output?.UserName)
         props.setMutualRender(prev=>prev.map((data, i) =>
             i == userIndex? {...data,unreadMsg: false} : data
         ))
         props.setChatFriendDetail(C=>output)
         props.setChatView(true)
-        const Msg1 = output.UserName + props.userCredentials.UserName
-        const Msg2 = props.userCredentials.UserName + output.UserName
+        const Msg1 = output?.UserName + props.userCredentials?.UserName
+        const Msg2 = props.userCredentials?.UserName + output?.UserName
         let Msg;
         let message1;
         let message2;
@@ -120,26 +120,26 @@ const Chats = (props) => {
                         props.setChatInfo(M=>Msg1)
                         let mutuals = []
                         let friendMutuals = []
-                        get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
+                        get(ref(db,`Users/${props.userCredentials?.UserName}/mutualFriends`))
                         .then((data)=>{
                             if(data.exists()){
                                 mutuals = data.val()
                             }
-                            if(!(mutuals?.includes(output.UserName))){
-                                mutuals.push(output.UserName)
-                                update(ref(db, `Users/${props.userCredentials.UserName}`),{
+                            if(!(mutuals?.includes(output?.UserName))){
+                                mutuals.push(output?.UserName)
+                                update(ref(db, `Users/${props.userCredentials?.UserName}`),{
                                     mutualFriends: mutuals
                                 })
                             }
                         })
-                        get(ref(db,`Users/${output.UserName}/mutualFriends`))
+                        get(ref(db,`Users/${output?.UserName}/mutualFriends`))
                         .then((data)=>{
                             if(data.exists()){
                                 friendMutuals = data.val()
                             } 
-                            if(!(friendMutuals?.includes(output.UserName))){
-                                friendMutuals.push(props.userCredentials.UserName)
-                                update(ref(db, `Users/${output.UserName}`),{
+                            if(!(friendMutuals?.includes(output?.UserName))){
+                                friendMutuals.push(props.userCredentials?.UserName)
+                                update(ref(db, `Users/${output?.UserName}`),{
                                     mutualFriends: friendMutuals
                                 })
                             }
@@ -151,15 +151,15 @@ const Chats = (props) => {
                         props.setChatInfo(M=>message1)
                         let mutuals;
                         let friendMutual;
-                        get(ref(db,`Users/${props.userCredentials.UserName}/mutualFriends`))
+                        get(ref(db,`Users/${props.userCredentials?.UserName}/mutualFriends`))
                         .then((data)=>{
                             mutuals = data.val()
                             const findFriend = mutuals.find(friend=>
-                                friend == output.UserName
+                                friend == output?.UserName
                             )
                             if(!findFriend || findFriend.length == 0){
-                                mutuals.push(output.UserName)
-                                update(ref(db, `Users/${props.userCredentials.UserName}/mutualFriends`),{
+                                mutuals.push(output?.UserName)
+                                update(ref(db, `Users/${props.userCredentials?.UserName}/mutualFriends`),{
                                     mutualFriends: mutuals
                                 })
                             }
@@ -188,12 +188,15 @@ const Chats = (props) => {
         props.setChatView(false)
         props.setViewState(()=>"blog")
     }
+    const settings = () =>{
+        props.setChangeSection(()=>"settings")
+    }
     return (
         <div className='chats-overall'>
             <h1>Chats</h1>
             <img className='moreOption' src={more} alt="" onClick={openMoreOption}/>
             <div className="optionList" style={moreOption?{display:"flex"}: {display:"none"}}>
-                <div className="option settings"><p>Settings</p></div>
+                <div className="option settings" onClick={settings}><p>Settings</p></div>
                 <div className="option" onClick={blogComp}><p>Chat Blog</p></div>
                 <div className="option"><p>About</p></div>
                 <div className="option"><p>Donate</p></div>
@@ -211,11 +214,11 @@ const Chats = (props) => {
                 {
                     props.chatSearchFilter.slice().reverse().map((output,index)=>(  
                         <div className='chat' key={index} onClick={()=>message(output)}>
-                            <img src={output.profilePic} alt="" />
+                            <img src={output?.profilePic} alt="" />
                             <div style={{display:"flex",flexDirection:"column"}}>
-                                <p>{output.FullName}</p>
-                                <small style={{color:'whitesmoke'}}>@{output.UserName}</small>
-                                {output.unreadMsg? <main className='unread'></main>: null}
+                                <p>{output?.FullName}</p>
+                                <small style={{color:'whitesmoke'}}>@{output?.UserName}</small>
+                                {output?.unreadMsg? <main className='unread'></main>: null}
                             </div>
                         </div>
                     ))

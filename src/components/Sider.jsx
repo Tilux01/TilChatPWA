@@ -29,6 +29,9 @@ const Sider = (props) => {
     props.setChangeSection("live")
     props.fetchVideo("sport")
   }
+  const settingsPage = () =>{
+    props.setChangeSection("settings")
+  }
   return (
     <div className='sider-parent'>
       <div onClick={chats}>
@@ -51,7 +54,7 @@ const Sider = (props) => {
         <img src={live} alt="" />
         <p>Live</p>
       </div>
-      <div className='settingsIconSider'>
+      <div className='settingsIconSider' onClick={settingsPage}>
         <img src={settings} alt="" />
         <p>Settings</p>
       </div>

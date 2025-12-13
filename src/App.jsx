@@ -56,11 +56,11 @@ function Home(props) {
   const userNameGet = localStorage.getItem("TilChat")
   
   useEffect(() => {
-    if(!userNameGet){
+    if(!userNameGet || userNameGet?.profileId == "123" || userNameGet == {}){
       navigate("/signup")
     }
     else{
-      setUserName(JSON.parse(userNameGet).UserName)
+      setUserName(JSON.parse(userNameGet)?.UserName)
     }
   }, [navigate])
 
@@ -71,18 +71,27 @@ function Home(props) {
 
   useEffect(() => {
     const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
-    get(ref(db,`Users/${userNameLoc? userNameLoc.UserName : null}`))
-    .then((output)=>{
+    onValue(ref(db,`Users/${userNameLoc? userNameLoc.UserName : null}`), (output)=>{
       if(output.exists()){
         setUserCredentials(output.val())
-        localStorage.setItem("TilChat",JSON.stringify({UserName: output.val().UserName,uniqueId: output.val().uniqueId,profileId: output.val().profileId, profilePic:output.val().profilePic}))
+        if (output.val()?.UserName && output.val()?.uniqueId && output.val()?.profileId) {
+          localStorage.setItem("TilChat",JSON.stringify({UserName: output.val().UserName,uniqueId: output.val().uniqueId,profileId: output.val().profileId, profilePic:output.val().profilePic}))
+        }
+        else{
+          localStorage.setItem("TilChat", null)
+          navigate("/signup")
+        }
+      }
+      else{
+        localStorage.setItem("TilChat", null)
+        navigate("/signup")
       }
     })
   }, [])
 
   useEffect(() => {
     if(userNameGet){
-      const user = JSON.parse(userNameGet).UserName
+      const user = JSON.parse(userNameGet)?.UserName
       onValue(ref(db, `Users/${user}/onlineCheck`), (result)=>{
         if (result.val()) {
           set(ref(db, `Users/${user}/onlineCheck`), null)
@@ -180,7 +189,7 @@ function App() {
   const userNameGet = localStorage.getItem("TilChat")
   const [userName, setUserName] = useState()
   useEffect(() => {
-      if(!userNameGet){
+      if(!userNameGet || userNameGet.profileId == "123" || userNameGet == {}){
           navigate("/signup")
       }
       else{

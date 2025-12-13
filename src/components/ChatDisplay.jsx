@@ -189,7 +189,7 @@ const ChatDisplay = (props) => {
     };
     const userNameGet = localStorage.getItem("TilChat")
     useEffect(() => {
-        if(!userNameGet){
+        if(!userNameGet || userNameGet.profileId == "123"|| userNameGet == {}){
             navigate("/signup")
         }
         else{
@@ -202,7 +202,6 @@ const ChatDisplay = (props) => {
     const openDB = () => {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('TilDB', 1)
-
             request.onupgradeneeded = (event) => {
             const db = event.target.result
             if (!db.objectStoreNames.contains('chats')) {
@@ -323,18 +322,23 @@ const ChatDisplay = (props) => {
                     }
                     else{
                         const userName = JSON.parse(localStorage.getItem("TilChat")).UserName
-                        setChatArray(prev => prev.map(item => {
-                            if (item[userName]) {
-                                return {
-                                    ...item,
-                                        [userName]: {
-                                        ...item[userName],
-                                        progress: item[userName].progress === sent || item[userName].progress === online ? seen : item[userName].progress
+                        get(ref(db, `Users/${props.chatFriendDetail.UserName}/readReceipt`))
+                        .then((receipt)=>{
+                            if (!receipt.exists() || receipt.val() != false) {
+                                setChatArray(prev => prev.map(item => {
+                                    if (item[userName]) {
+                                        return {
+                                            ...item,
+                                                [userName]: {
+                                                ...item[userName],
+                                                progress: item[userName].progress === sent || item[userName].progress === online ? seen : item[userName].progress
+                                            }
+                                        };
                                     }
-                                };
+                                    return item;
+                                }));
                             }
-                            return item;
-                        }));
+                        })
                     }
                     scrollToBottom()
                 }

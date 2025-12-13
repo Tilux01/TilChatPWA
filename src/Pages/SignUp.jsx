@@ -79,12 +79,16 @@ const SignUp = () => {
     const imgUpload = async(e) =>{
       const file = e.target.files[0];
       if (!file) return;
+      if (file.size > 3008961) {
+        alert("image size is too big")
+        return
+      }
       
       try {
-        // const reducedQualityBase64 = await reduceImageQualityToBase64(file, 0.5, 1024, 1024);
-        // setProfilePic(reducedQualityBase64.base64)
+        const reducedQualityBase64 = await reduceImageQualityToBase64(file, 0.5, 1024, 1024);
+        setProfilePic(reducedQualityBase64.base64)
       } catch (error) {
-        console.error('Error reducing image quality:', error);
+        alert("error, invalid image")
       }
     }
     const changeInfo = (e) =>{
@@ -191,7 +195,8 @@ const SignUp = () => {
                     _search: {
                     fullName: FullName.toLowerCase(),
                     userName: UserName.toLowerCase(),
-                    type: {type:[]}
+                    type: {type:[]},
+                    readReceipt: true
                   }
                 })
                 
@@ -257,7 +262,7 @@ const SignUp = () => {
                   <img src={edit} alt="" className='edit'/>
                 </label>
               </div>
-              <input type="file" accept='images/*' onChange={imgUpload} id='upload' name='upload' style={{display:"none"}}/>
+              <input type="file" accept='image/*' onChange={imgUpload} id='upload' name='upload' style={{display:"none"}}/>
             </div>
             <div className="input">
               <img src={name} alt="" />
@@ -269,7 +274,7 @@ const SignUp = () => {
             </div>
             <div className="input">
               <img src={passwordImg} alt="" />
-              <input type="text" placeholder='Password' value={Password} onChange={PasswordCheck}/>
+              <input type="password" placeholder='Password' value={Password} onChange={PasswordCheck}/>
             </div>
             <button onClick={Submit}>Sign Up</button>
           </div>

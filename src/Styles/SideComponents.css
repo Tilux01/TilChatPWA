@@ -7,6 +7,9 @@
     /* overflow: hidden; */
     height: 100vh;
 }
+.live-side{
+    width: 420px !important;
+}
 .chats-Parent-overall{
     width: 100%;
     overflow: hidden;
@@ -19,6 +22,9 @@
 @media screen and (max-width: 1235px) {
     .side-components-parent{
         width: 550px;
+    }
+    .live-side{
+        width: 370px !important;
     }
 }
 @media screen and (max-width: 1000px) {
@@ -33,5 +39,8 @@
 @media screen and (max-width: 800px) {
     .side-components-parent{
         width: 100%;
+    }
+    .live-side{
+        width: 100% !important;
     }
 }

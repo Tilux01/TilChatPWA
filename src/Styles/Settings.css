@@ -1,0 +1,249 @@
+.settings-overall{
+    display: flex;
+    flex-direction: column;
+}
+.settings-overall > h1{
+    color: white;
+    margin:35px 15px 10px;
+    font-size: 30px;
+}
+.settings-overall .profilePreview{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+.settings-overall .profilePreview .imagePrev{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.settings-overall .profilePreview .imagePrev .profileImg{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #2176ff9f;
+    cursor: pointer;
+}
+.settings-overall .profilePreview .imagePrev .editIcon{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #eeedece1;
+    padding:5px;
+    filter: invert(1);
+    position: absolute;
+    top: 170px;
+    left: 200px;
+    cursor: pointer;
+}
+.settings-overall .profilePreview p{
+    color: white;
+    margin-top: 10px;
+    font-weight: 600;
+}
+.settings-overall .profilePreview h6{
+    color: rgba(245, 245, 245, 0.719);
+}
+.settings-overall .breakLine{
+    width: 90%;
+    left: 5%;
+    position: relative;
+    height: 0.6px;
+    background: rgba(245, 245, 245, 0.144);
+    margin-top: 35px;
+    box-shadow: 0px 5px 10px rgba(255, 254, 254, 0.062);
+}
+.settings-overall .options-parent{
+    display: flex;
+    flex-direction: column;
+    padding: 20px 00px 0px 20px;
+    overflow-y: scroll;
+    gap: 20px;
+    height: calc(100vh - 300px);
+}
+.settings-overall .options-parent::-webkit-scrollbar{
+    width: 4px;
+}
+.settings-overall .options-parent::-webkit-scrollbar-thumb{
+    background: rgba(245, 245, 245, 0.144);
+    border-radius: 10px;
+}
+.settings-overall .options-parent > div{
+    width: calc(100% - 20px);
+    display: flex;
+    flex-direction: column;
+}
+.settings-overall .options-parent > div .option-start{
+    background: rgba(128, 128, 128, 0.089);
+    height: 40px;
+    width: 100%;
+    cursor: pointer;
+    border: 1px solid rgba(245, 245, 245, 0.144);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 10px;
+    border-radius: 5px;
+    
+}
+.settings-overall .options-parent > div .option-start img{
+    width: 10px;
+    height: 10px;
+    filter: opacity(.7);
+    transform: rotate(-90deg);
+}
+.settings-overall .options-parent > div .option-start p{
+    font-weight: 600;
+    color: white;
+    font-size: 14px;
+}
+.settings-overall .options-parent > div .other-option{
+    width: 100%;
+    background: #2176ff2d;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(70, 69, 69, 0.342);
+    gap: 10px;
+}
+.settings-overall .options-parent > div .other-option > div{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.settings-overall .options-parent > div .other-option > div h3{
+    color: white;
+    font-size: 16px;
+}
+.settings-overall .options-parent > div .other-option > div p{
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.74);
+    font-weight: 600;
+}
+.settings-overall .select{
+    width: 90px !important;
+    height: 35px !important;
+    padding: 5px !important;
+}
+.settings-overall .small-opt{
+    gap: 5px !important;
+    width: calc(100% + 15px) !important;
+    padding: 10px 5px !important;
+    z-index: 1;
+    position: relative;
+    background: rgba(70, 69, 69, 1) !important;
+    right: 5px;
+}
+.settings-overall .small-opt > div{
+    height: 20px !important;
+    cursor: pointer;
+}
+.settings-overall .small-opt > div:hover{
+    background: rgba(65, 64, 64, 0.89);
+}
+.settings-overall .small-opt > div h3{
+    font-weight: 600;
+    font-size: 12px !important;
+}
+.settings-overall .options-parent > div .other-option > div .editBtn{
+    display: flex;
+    background: rgba(128, 128, 128, 0.342);
+    width: 55px;
+    height: 30px;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+    border-radius: 5px;
+    gap: 5px;
+}
+.settings-overall .options-parent > div .other-option > div .editBtn img{
+    height: 15px;
+    width: 15px;
+    filter: invert(1);
+}
+.settings-overall .options-parent > div .other-option > div .editBtn h6{
+    font-weight: 600;
+    color: white;
+}
+.settings-overall .options-parent > div .other-option > div input{
+    font-weight: 600;
+    font-size: 13px;
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(128, 128, 128, 0.466);
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: -5px;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+.settings-overall .log-out-btn{
+    background: rgba(128, 128, 128, 0.466);
+    /* height: 40px; */
+    width: calc(100% - 20px);
+    cursor: pointer;
+    border: 0;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 10px;
+    border-radius: 5px;
+}

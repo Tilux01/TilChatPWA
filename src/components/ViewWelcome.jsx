@@ -12,7 +12,7 @@ const ViewWelcome = (props) => {
     const [userCredentials, setUserCredentials] = useState([])
     const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
     const navigate = useNavigate()
-    if (!userNameLoc) {
+    if (!userNameLoc || userNameLoc.profileId == "123"|| userNameLoc == {}) {
         navigate("/signup")
     }
     const changePage = () => {
