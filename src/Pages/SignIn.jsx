@@ -104,7 +104,7 @@ const SignIn = () => {
                 <img src={passwordImg} alt="" />
                 <input type="text" placeholder='password' value={Password} onChange={PasswordCheck}/>
               </div>
-              <button onClick={signIn}>SignUp</button>
+              <button onClick={signIn}>Sign In</button>
               <p>Forgot Password?</p>
             </div>
           </div>

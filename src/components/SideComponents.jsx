@@ -576,7 +576,7 @@ const SideComponents = (props) => {
         <div className='side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='status-Parent' style={{height:"100%"}}>
-                {statusType?<UserStatus userCredentials={props.userCredentials} setChatState={props.setChatState} statusArray={statusArray} setStatusArray={setStatusArray} setStatusType={setStatusType}/>:<StatusPage setChatState={props.setChatState} userCredentials={props.userCredentials} setStatusType={setStatusType} sortUsers={sortUsers} allStatusUser={allStatusUser} filterStatus={filterStatus} feed={feed} setFeed={setFeed} setViewState={props.setViewState} ViewState={props.ViewState} feedObject={props.feedObject} setFeedObject={props.setFeedObject} setChatView={props.setChatView}/>}
+                {statusType?<UserStatus setChangeSection={setChangeSection} userCredentials={props.userCredentials} setChatState={props.setChatState} statusArray={statusArray} setStatusArray={setStatusArray} setStatusType={setStatusType}/>:<StatusPage setChangeSection={setChangeSection} setChatState={props.setChatState} userCredentials={props.userCredentials} setStatusType={setStatusType} sortUsers={sortUsers} allStatusUser={allStatusUser} filterStatus={filterStatus} feed={feed} setFeed={setFeed} setViewState={props.setViewState} ViewState={props.ViewState} feedObject={props.feedObject} setFeedObject={props.setFeedObject} setChatView={props.setChatView}/>}
             </div>
         </div>
       )
@@ -596,7 +596,7 @@ const SideComponents = (props) => {
         <div className='side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='chats-Parent-overall' >
-                <FriendsComponent mutualRenderInverse={mutualRenderInverse} mutualRender={props.mutualRender} setMutualRender={props.setMutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
+                <FriendsComponent setChangeSection={setChangeSection} mutualRenderInverse={mutualRenderInverse} mutualRender={props.mutualRender} setMutualRender={props.setMutualRender} setChatState={props.setChatState} setChatView={props.setChatView} setChatInfo={props.setChatInfo} chatInfo={props.chatInfo} setChatFriendDetail={props.setChatFriendDetail}/>
             </div>
         </div>
       )
@@ -606,7 +606,7 @@ const SideComponents = (props) => {
         <div className='live-side side-components-parent' style={props.chatState == "chat"? {display: "none"} : {display: "flex"}}>
             <Sider setChatState={props.setChatState} setChangeSection={setChangeSection} setViewState={props.setViewState} ViewState={props.ViewState} fetchVideo={fetchVideo} setChatView={props.setChatView}/>
             <div className='chats-Parent-overall'>
-                <Live setChatState={props.setChatState} fetchVideo={fetchVideo} videoItems={videoItems} setVideoSearch={setVideoSearch} videoSearch={videoSearch} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} setChatView={props.setChatView}/>
+                <Live setChangeSection={setChangeSection} setChatState={props.setChatState} fetchVideo={fetchVideo} videoItems={videoItems} setVideoSearch={setVideoSearch} videoSearch={videoSearch} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} setChatView={props.setChatView}/>
             </div>
         </div>
       )

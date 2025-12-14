@@ -204,6 +204,7 @@ const Settings = (props) => {
     }
 
     const logOut = () =>{
+        saveChat("friendsList", null)
         localStorage.removeItem("TilChat")
         navigate("/signup")
     }
@@ -270,239 +271,259 @@ const Settings = (props) => {
                     })
                 }
             })
-            console.log(backupArray.current);
+            // console.log(backupArray.current);
+            backupArray.current.map((value)=>{
+                const DBKeys = Object.keys(value)[0]
+                // console.log(value);
+                
+                value[DBKeys].map((result, index)=>{
+                    update(ref(db, `Backup/${props.userCredentials.UserName}/${DBKeys}/`),{
+                        [index] : result
+                    })
+                    .then(()=>{
+                        backupArray.current = []
+                        setBackupActive(false)
+                        console.log(index, result);
+                        
+                    })
+                })
+            })
+            alert("done")
             // setBackupActive(true)
-            if (backupArray.current && backupArray.current.length > 0) {
-                set(ref(db, `Backup/${props.userCredentials.UserName}`),{
-                    backUp: backupArray.current
-                })
-                .then(()=>{
-                    backupArray.current = []
-                    setBackupActive(false)
-                })
-            }
+            // if (backupArray.current && backupArray.current.length > 0) {
+            // }
         })
         .finally(()=>{
         })
     }
 
     const restoreBackup = () =>{
-        get(ref(db, `Backup/${props.userCredentials.UserName}/backUp`))
+        get(ref(db, `Backup/${props.userCredentials.UserName}`))
         .then((backup)=>{
-            if (backup.exists()) {
-                console.log("backup", backup.val());
+            alert("done")
+            console.log("backup", backup.val());
+            if (backup.exists()) {      
+                const backupList = [Object.entries(backup.val())]
+                console.log(backupList);
+                const convertedArray = []
+                backupList[0].map((output, index)=>{
+                    const listObj = {[output[0]]: output[1]}
+                    convertedArray.push(listObj)
+                })
+                convertedArray.map((output)=>{
+                    const key =  Object.keys(output)[0]
+                    console.log(output[key]);
+                    saveChat(key, output[key])
+                })
             }
-            backup.val().map((output)=>{
-                const key =  Object.keys(output)[0]
-                console.log(output[key]);
-                saveChat(key, output[key])
-            })
             
         })
     }
     return (
         <div className='settings-overall'>
             <h1>Settings</h1>
-            <div className="profilePreview">
-                <input ref={profileImgUpdate} onChange={updatePic} style={{display:"none"}} type="file" name="profileImgUpload" id="profileImgUpload" accept='image/*'/>
-                <div className="imagePrev">
-                        <img src={props.userCredentials.profilePic || userImg} alt="" className='profileImg'/>
-                        <label htmlFor="profileImgUpload">
-                            <img src={editImg} alt="" className="editIcon" />
-                        </label>
-                </div>
-                <p>{props.userCredentials.FullName}</p>
-                <h6>{props.userCredentials.UserName}</h6>
-            </div>
-            <div className="breakLine"></div>
-            <div className="options-parent">
-                <div className="">
-                    <div className="option-start" onClick={()=>changeOption('personal info')}>
-                            <p>Personal Info</p>
-                            <img style={optionMenu == "personal info"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
-                    </div>
-                    <div style={optionMenu == "personal info"? {display:"flex"} : {display:"none"}} className="other-option">
-                        <div>
-                            <div className="creden">
-                                <h3>Name</h3>
-                                {editName? <input onChange={(e)=>{setVirtualNameValue(e.target.value)}} type='text' value={VirtualNameValue}/> : <p>{nameValue}</p>} 
-                            </div>
-                            {
-                                editName?
-                                    <div className="editBtn" style={{background:"green"}} onClick={saveEditName}>
-                                        <h6>Save</h6>
-                                    </div>:
-                                <div className="editBtn" onClick={showEditName}>
-                                    <img src={editImg} alt="" />
-                                    <h6>Edit</h6>
-                                </div>
-                            }
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <h3>Mail</h3>
-                                {editMail? <input onChange={(e)=>{setVirtualMailValue(e.target.value)}} type='text' value={VirtualMailValue}/> : <p>{mailValue}</p>} 
-                            </div>
-                            {
-                                editMail?
-                                    <div className="editBtn" style={{background:"green"}} onClick={saveEditMail}>
-                                        <h6>Save</h6>
-                                    </div>:
-                                <div className="editBtn" onClick={showEditMail}>
-                                    <img src={editImg} alt="" />
-                                    <h6>Edit</h6>
-                                </div>
-                            }
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <h3>DOB</h3>
-                                <p>{props.userCredentials.DOB}</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <h3>Location</h3>
-                                <p>{location}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="">
-                    <div className="option-start" onClick={()=>changeOption('privacy')}>
-                            <p>Privacy</p>
-                            <img style={optionMenu == "privacy"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
-                    </div>
-                    <div style={optionMenu == "privacy"? {display:"flex"} : {display:"none"}} className="other-option">
-                        <div>
-                            <div className="creden">
-                                <p>Profile photo</p>
-                            </div>
-                            <div className='select'>
-                                <div className="select option-start" onClick={profileShowList}>
-                                    <p>{profilePhotoSelected}</p>
-                                    <img style={profilePhotoList? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
-                                </div>
-                                <div style={profilePhotoList? {display:"flex"} : {display:"none"}} className="small-opt other-option">
-                                    <div onClick={()=>{selectedProfileShow("Everyone")}}>
-                                        <div className="creden">
-                                            <h3>Everyone</h3>
-                                        </div>
-                                    </div>
-                                    <div onClick={()=>{selectedProfileShow("Selected")}}>
-                                        <div className="creden">
-                                            <h3>Selected</h3>
-                                        </div>
-                                    </div>
-                                    <div onClick={()=>{selectedProfileShow("All Except")}}>
-                                        <div className="creden">
-                                            <h3>All Except</h3>
-                                        </div>
-                                    </div>
-                                    <div onClick={()=>{selectedProfileShow("None")}}>
-                                        <div className="creden">
-                                            <h3>None</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <p>Last seen</p>
-                            </div>
-                            <label className="switch">
-                                <input type="checkbox" />
-                                <span className="slider round"></span>
+            <div className="scrollParent">
+                <div className="profilePreview">
+                    <input ref={profileImgUpdate} onChange={updatePic} style={{display:"none"}} type="file" name="profileImgUpload" id="profileImgUpload" accept='image/*'/>
+                    <div className="imagePrev">
+                            <img src={props.userCredentials.profilePic || userImg} alt="" className='profileImg'/>
+                            <label htmlFor="profileImgUpload">
+                                <img src={editImg} alt="" className="editIcon" />
                             </label>
+                    </div>
+                    <p>{props.userCredentials.FullName}</p>
+                    <h6>{props.userCredentials.UserName}</h6>
+                </div>
+                <div className="breakLine"></div>
+                <div className="options-parent">
+                    <div className="">
+                        <div className="option-start" onClick={()=>changeOption('personal info')}>
+                                <p>Personal Info</p>
+                                <img style={optionMenu == "personal info"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
                         </div>
-                        <div>
-                            <div className="creden">
-                                <p>Status</p>
-                            </div>
-                            <div className='select'>
-                                <div className="select option-start" onClick={StatusShowList}>
-                                    <p>{StatusSelected}</p>
-                                    <img style={statusList? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
+                        <div style={optionMenu == "personal info"? {display:"flex"} : {display:"none"}} className="other-option">
+                            <div>
+                                <div className="creden">
+                                    <h3>Name</h3>
+                                    {editName? <input onChange={(e)=>{setVirtualNameValue(e.target.value)}} type='text' value={VirtualNameValue}/> : <p>{nameValue}</p>} 
                                 </div>
-                                <div style={statusList? {display:"flex"} : {display:"none"}} className="small-opt other-option">
-                                    <div onClick={()=>{selectedStatusShow("Everyone")}}>
-                                        <div className="creden">
-                                            <h3>Everyone</h3>
-                                        </div>
+                                {
+                                    editName?
+                                        <div className="editBtn" style={{background:"green"}} onClick={saveEditName}>
+                                            <h6>Save</h6>
+                                        </div>:
+                                    <div className="editBtn" onClick={showEditName}>
+                                        <img src={editImg} alt="" />
+                                        <h6>Edit</h6>
                                     </div>
-                                    <div onClick={()=>{selectedStatusShow("Selected")}}>
-                                        <div className="creden">
-                                            <h3>Selected</h3>
-                                        </div>
+                                }
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <h3>Mail</h3>
+                                    {editMail? <input onChange={(e)=>{setVirtualMailValue(e.target.value)}} type='text' value={VirtualMailValue}/> : <p>{mailValue}</p>} 
+                                </div>
+                                {
+                                    editMail?
+                                        <div className="editBtn" style={{background:"green"}} onClick={saveEditMail}>
+                                            <h6>Save</h6>
+                                        </div>:
+                                    <div className="editBtn" onClick={showEditMail}>
+                                        <img src={editImg} alt="" />
+                                        <h6>Edit</h6>
                                     </div>
-                                    <div onClick={()=>{selectedStatusShow("All Except")}}>
-                                        <div className="creden">
-                                            <h3>All Except</h3>
-                                        </div>
+                                }
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <h3>DOB</h3>
+                                    <p>{props.userCredentials.DOB}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <h3>Location</h3>
+                                    <p>{location}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="">
+                        <div className="option-start" onClick={()=>changeOption('privacy')}>
+                                <p>Privacy</p>
+                                <img style={optionMenu == "privacy"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
+                        </div>
+                        <div style={optionMenu == "privacy"? {display:"flex"} : {display:"none"}} className="other-option">
+                            <div>
+                                <div className="creden">
+                                    <p>Profile photo</p>
+                                </div>
+                                <div className='select'>
+                                    <div className="select option-start" onClick={profileShowList}>
+                                        <p>{profilePhotoSelected}</p>
+                                        <img style={profilePhotoList? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
                                     </div>
-                                    <div onClick={()=>{selectedStatusShow("None")}}>
-                                        <div className="creden">
-                                            <h3>None</h3>
+                                    <div style={profilePhotoList? {display:"flex"} : {display:"none"}} className="small-opt other-option">
+                                        <div onClick={()=>{selectedProfileShow("Everyone")}}>
+                                            <div className="creden">
+                                                <h3>Everyone</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedProfileShow("Selected")}}>
+                                            <div className="creden">
+                                                <h3>Selected</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedProfileShow("All Except")}}>
+                                            <div className="creden">
+                                                <h3>All Except</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedProfileShow("None")}}>
+                                            <div className="creden">
+                                                <h3>None</h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <p>Read Receipt</p>
+                            <div>
+                                <div className="creden">
+                                    <p>Last seen</p>
+                                </div>
+                                <label className="switch">
+                                    <input type="checkbox" />
+                                    <span className="slider round"></span>
+                                </label>
                             </div>
-                            <label className="switch">
-                                <input type="checkbox" onClick={(e)=>{changeReceipt(e)}} checked={readReceipt}/>
-                                <span className="slider round"></span>
-                            </label>
+                            <div>
+                                <div className="creden">
+                                    <p>Status</p>
+                                </div>
+                                <div className='select'>
+                                    <div className="select option-start" onClick={StatusShowList}>
+                                        <p>{StatusSelected}</p>
+                                        <img style={statusList? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
+                                    </div>
+                                    <div style={statusList? {display:"flex"} : {display:"none"}} className="small-opt other-option">
+                                        <div onClick={()=>{selectedStatusShow("Everyone")}}>
+                                            <div className="creden">
+                                                <h3>Everyone</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedStatusShow("Selected")}}>
+                                            <div className="creden">
+                                                <h3>Selected</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedStatusShow("All Except")}}>
+                                            <div className="creden">
+                                                <h3>All Except</h3>
+                                            </div>
+                                        </div>
+                                        <div onClick={()=>{selectedStatusShow("None")}}>
+                                            <div className="creden">
+                                                <h3>None</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <p>Read Receipt</p>
+                                </div>
+                                <label className="switch">
+                                    <input type="checkbox" onClick={(e)=>{changeReceipt(e)}} checked={readReceipt}/>
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
+                    <div className="">
+                        <div className="option-start" onClick={()=>changeOption('security')}>
+                                <p>Security</p>
+                                <img style={optionMenu == "security"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
+                        </div>
+                        <div style={optionMenu == "security"? {display:"flex"} : {display:"none"}} className="other-option">
+                            <div>
+                                <div className="creden">
+                                    <p>Show Security Notification</p>
+                                </div>
+                                <label className="switch">
+                                    <input type="checkbox" />
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="">
+                        <div className="option-start" onClick={()=>changeOption('help')}>
+                                <p>Help</p>
+                                <img style={optionMenu == "help"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
+                        </div>
+                        <div style={optionMenu == "help"? {display:"flex"} : {display:"none"}} className="other-option">
+                            <div>
+                                <div className="creden">
+                                    <p>FAQs</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <p>Contact</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="creden">
+                                    <p>Terms & Privacy policy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button className='log-out-btn' onClick={backUp} disabled={backupActive}>Back Up</button>
+                    <button className='log-out-btn' onClick={restoreBackup}>Restore Backup</button>
+                    <button className='log-out-btn' onClick={logOut}>Log Out</button>
                 </div>
-                <div className="">
-                    <div className="option-start" onClick={()=>changeOption('security')}>
-                            <p>Security</p>
-                            <img style={optionMenu == "security"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
-                    </div>
-                    <div style={optionMenu == "security"? {display:"flex"} : {display:"none"}} className="other-option">
-                        <div>
-                            <div className="creden">
-                                <p>Show Security Notification</p>
-                            </div>
-                            <label className="switch">
-                                <input type="checkbox" />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="">
-                    <div className="option-start" onClick={()=>changeOption('help')}>
-                            <p>Help</p>
-                            <img style={optionMenu == "help"? {transform:"rotate(90deg)"} : {transform:"rotate(-90deg)"}} src={downArrow} alt="" className='down-arrow'/>
-                    </div>
-                    <div style={optionMenu == "help"? {display:"flex"} : {display:"none"}} className="other-option">
-                        <div>
-                            <div className="creden">
-                                <p>FAQs</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <p>Contact</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="creden">
-                                <p>Terms & Privacy policy</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button className='log-out-btn' onClick={backUp} disabled={backupActive}>Back Up</button>
-                <button className='log-out-btn' onClick={restoreBackup}>Restore Backup</button>
-                <button className='log-out-btn' onClick={logOut}>Log Out</button>
             </div>
         </div>
     )

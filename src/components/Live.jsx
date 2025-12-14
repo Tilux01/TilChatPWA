@@ -27,12 +27,15 @@ const Live = (props) => {
             setMoreOption(()=>"show")
         }
     }
+    const settingsComp = () =>{
+        props.setChangeSection(()=>"settings")
+    }
     return (
         <div className="live-overall">
         <h1>Live</h1>
         <img className='moreOption' src={more} alt="" onClick={openMoreOption}/>
         <div className="optionList" style={moreOption?{display:"flex"}: {display:"none"}}>
-            <div className="option settings"><p>Settings</p></div>
+            <div className="option settings" onClick={settingsComp}><p>Settings</p></div>
             <div className="option"><p>Chat Blog</p></div>
             <div className="option"><p>About</p></div>
             <div className="option"><p>Donate</p></div>
