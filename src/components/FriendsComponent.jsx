@@ -6,6 +6,8 @@ import {getDatabase,ref,push,set,get, query, onValue, orderByChild, equalTo, ord
 import { BrowserRouter as Router, Routes, Route,Navigate, useNavigate } from 'react-router-dom';
 import Loader from "./Loader";
 import more from "../images/more.png"
+import userImg from "../images/user.png"
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyCoDIlOAkemogzj-Gw2G_lVO7VI7uEeIG8",
@@ -312,17 +314,17 @@ const FriendsComponent = (props) => {
             <div className="friends-parent">
                 <h2>{DisplaySearch}</h2>
                 {
-                    listArray.map((output, index) => {
+                    listArray?.map((output, index) => {
                         const userNameLoc = JSON.parse(localStorage.getItem("TilChat"))
-                        const userName = userNameLoc.UserName
-                        if (output.UserName != userName) {
-                            if (friends.length === 0) {
+                        const userName = userNameLoc?.UserName
+                        if (output?.UserName != userName) {
+                            if (friends?.length === 0) {
                                 return (
                                     <div id={`parent${index}`} className="friends" key={`empty-${index}`}>
-                                        <img src={output.profilePic} alt="" />
+                                        <img src={output?.profilePic || userImg} alt="" />
                                         <div>
-                                            <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
-                                            <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
+                                            <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
+                                            <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
                                             <div className="Btn">
                                                 <button onClick={(e) => addFriend(output,e)} className="add-btn">Add</button>
                                                     <button className="remove-btn">Remove</button>
@@ -335,7 +337,7 @@ const FriendsComponent = (props) => {
                                 
                                 else {
                                 // setFriendStatus()
-                                const outputName = output.UserName
+                                const outputName = output?.UserName
                                 const friendMatch = friends.find(friend => 
                                     friend.UserName ==  outputName  
                                 )
@@ -343,14 +345,14 @@ const FriendsComponent = (props) => {
                                     friend.UserName == userName
                                 )
                                 if(friendMatch && outputMatch){
-                                    if(friendMatch.Validate == false && outputMatch.Validate == true){
+                                    if(friendMatch?.Validate == false && outputMatch?.Validate == true){
                                         
                                         return(
                                             <div id={`parent${index}`} className="friends" key={`nonfriend-${index}`}>
-                                                <img src={output.profilePic} alt="" />
+                                                <img src={output?.profilePic} alt="" />
                                                 <div>
-                                                    <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
-                                                    <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
+                                                    <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
+                                                    <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
                                                     <div className="Btn">
                                                         <button onClick={(e) => confirmFriend(output,index,e)} style={{width:"150px"}} className="add-btn">confirm</button>
                                                     </div>
@@ -358,13 +360,13 @@ const FriendsComponent = (props) => {
                                             </div>
                                         )
                                     }
-                                    else if(friendMatch.Validate == true && outputMatch.Validate == true){
+                                    else if(friendMatch?.Validate == true && outputMatch?.Validate == true){
                                         return (
                                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                                    <img src={output.profilePic} alt="" />
+                                                    <img src={output?.profilePic} alt="" />
                                                     <div>
-                                                        <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
-                                                        <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
+                                                        <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
+                                                        <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
                                                         <div className="Btn">
                                                             <button onClick={()=>{message(output)}} className='message-btn'>Message</button>
                                                         </div>
@@ -372,13 +374,13 @@ const FriendsComponent = (props) => {
                                                 </div>
                                             );
                                     }
-                                    else if (friendMatch.Validate == true && outputMatch.Validate == false) {
+                                    else if (friendMatch?.Validate == true && outputMatch?.Validate == false) {
                                         return (
                                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                                    <img src={output.profilePic} alt="" />
+                                                    <img src={output?.profilePic} alt="" />
                                                     <div>
-                                                        <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
-                                                        <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
+                                                        <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
+                                                        <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
                                                         <div className="Btn">
                                                             <button className='message-btn'>Cancel Request</button>
                                                         </div>

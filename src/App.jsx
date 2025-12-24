@@ -46,6 +46,8 @@ function Home(props) {
   const [chatState, setChatState] = useState("sider")
   const [showPermissionButton, setShowPermissionButton] = useState(false) 
   const [mutualRender, setMutualRender] = useState([])
+  const [otherDevices, setOtherDevices] = useState()
+  const [deviceUserAgent, setDeviceUserAgent] = useState()
   
   useEffect(() => {
     if (window.innerWidth > 800) {
@@ -99,6 +101,111 @@ function Home(props) {
       })
     }
   }, [])
+
+  function sanitizeUserAgent(userAgent) {
+    return userAgent
+      .replace(/\./g, '_dot_') 
+      .replace(/\#/g, '_hash_') 
+      .replace(/\$/g, '_dollar_')  
+      .replace(/\[/g, '_obracket_') 
+      .replace(/\]/g, '_cbracket_') 
+      .replace(/\//g, '_slash_') 
+      .replace(/\\/g, '_backslash_')
+      .replace(/\./g, '_period_');   
+  }
+
+  useEffect(() => {
+    if (userNameGet) {
+      const user = JSON.parse(userNameGet)?.UserName
+      const userAgent = navigator.userAgent
+      const deviceUA = sanitizeUserAgent(userAgent)
+      setDeviceUserAgent(deviceUA)
+      get(ref(db, `Devices/${user}`)) 
+      .then((result)=>{
+        if (result.exists()) {
+          const getDevice = result.val().filter(device => device == userAgent)
+          if (getDevice.length == 0) {
+            localStorage.removeItem("TilChat")
+            navigate("/signup")
+          }
+          else{
+            let checkAll = result.val()
+            if (result.val().length > 1) {
+              const all = result.val()
+              if (all[all.length - 1] == userAgent) {
+                checkAll = [all[all.length - 2], all[all.length - 1]]
+              }
+              else{
+                checkAll = [all[all.length - 1], userAgent]
+              }
+              
+              const sanitizeExpiredDevice = sanitizeUserAgent(all[0])
+              if (all.length > 2) {
+                set(ref(db, `DevicesMessages/${user}/"${sanitizeExpiredDevice}"`), null)
+              }
+              update(ref(db, `Devices`),{ 
+                [user] : checkAll 
+              })
+              const otherDev = checkAll.filter(device => device != userAgent)
+              let sanitizedUA = []
+              otherDev.map((UA)=>{
+                const performSan = sanitizeUserAgent(UA)
+                sanitizedUA.push(performSan)
+              })
+              console.log(sanitizedUA);
+              setOtherDevices(sanitizedUA)
+            }
+          }
+          
+        }
+        else{
+          let devices = []
+          devices.push(userAgent)
+          update(ref(db, `Devices`),{
+            [user] : devices
+          })
+        }
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    const user = JSON.parse(userNameGet)?.UserName
+    const userAgent = navigator.userAgent
+    onValue(ref(db, `Devices/${user}`), (result)=>{
+      console.log("all devices", result.val());
+      if (result.exists()) {
+        let checkAll = result.val()
+        const getDevice = result.val().filter(device => device == userAgent)
+        if (getDevice.length == 0) {
+          localStorage.removeItem("TilChat")
+          navigate("/signup")
+        }
+        else{
+          if (result.val().length > 1) {
+            const all = result.val()
+            if (all[all.length - 1] == userAgent) {
+              checkAll = [all[all.length - 2], all[all.length - 1]]
+            }
+            else{
+              checkAll = [all[all.length - 1], userAgent]
+            }
+            
+            const otherDev = checkAll.filter(device => device != userAgent)
+            let sanitizedUA = []
+            otherDev.map((UA)=>{
+              const performSan = sanitizeUserAgent(UA)
+              sanitizedUA.push(performSan)
+            })
+            console.log(sanitizedUA);
+            setOtherDevices(sanitizedUA)
+          }
+        }
+      }
+    })
+  }, [])
+
+
 
   const checkSubscriptionStatus = async (userId) => {
     try {
@@ -174,7 +281,7 @@ function Home(props) {
       return(
         <ViewStateContext.Provider value={props.ViewState}>
           <SideComponents mutualRender={mutualRender} setMutualRender={setMutualRender} chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} setChatView={setChat} setChatInfo={setChatInfo} chatInfo={chatInfo} setChatFriendDetail={setChatFriendDetail} chatFriendDetail={chatFriendDetail} feedObject={feedObject} setFeedObject={setFeedObject}/>
-          {!chat?<View chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} iframeLink={props.iframeLink} setChatInfo={setChatInfo} feedObject={feedObject} setFeedObject={setFeedObject} setChat={setChat}/>:<ChatDisplay mutualRender={mutualRender} setMutualRender={setMutualRender} setChatState={setChatState} chatState={chatState} setChatInfo={setChatInfo} chatInfo={chatInfo} chatFriendDetail={chatFriendDetail}/>}
+          {!chat?<View chatState={chatState} setChatState={setChatState} userCredentials={userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} iframeLink={props.iframeLink} setChatInfo={setChatInfo} feedObject={feedObject} setFeedObject={setFeedObject} setChat={setChat}/>:<ChatDisplay deviceUserAgent={deviceUserAgent} otherDevices={otherDevices} mutualRender={mutualRender} setMutualRender={setMutualRender} setChatState={setChatState} chatState={chatState} setChatInfo={setChatInfo} chatInfo={chatInfo} chatFriendDetail={chatFriendDetail}/>}
           {/* <FeedPreview/> */}
         </ViewStateContext.Provider>
       )

@@ -60,6 +60,8 @@ const analytics = getAnalytics(app);
 const ChatDisplay = (props) => {
   const navigate = useNavigate()
     // const useVal = ()=>{val()}
+    const [chatArray, setChatArray] = useState([])
+    const propsValue = useRef()
     const [userName, setUserName] = useState()
     const [mediaOption, setMediaOption] = useState(false)
     const [displayUrl, setDisplayUrl] = useState()
@@ -84,7 +86,7 @@ const ChatDisplay = (props) => {
     const [replyMsgCon, setReplyMsgCon] = useState()
     const audioTag = useRef("")
     const vnData = useRef()
-    
+    const holdChat = useRef([])
     
     
     const preview = (data, type) =>{
@@ -197,8 +199,7 @@ const ChatDisplay = (props) => {
             
         }
     }, [navigate])
-    const [chatArray, setChatArray] = useState([])
-    const propsValue = useRef()
+    
     const openDB = () => {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('TilDB', 1)
@@ -233,7 +234,7 @@ const ChatDisplay = (props) => {
             request.onerror = () => reject(request.error)
         })
     }
-
+    const holdPropsChat = useRef()
     useEffect(() => {
         setMicShow(()=>true)
         getChat(props.chatInfo)
@@ -246,7 +247,10 @@ const ChatDisplay = (props) => {
             }
         })
         .finally(()=>{
-            userPrompt.current.value = ""
+            holdPropsChat.current = props.chatInfo
+            if (userPrompt?.current?.value) {
+                userPrompt.current.value = ""
+            }
             get(ref(db, `Users/${userName}/type`))
             .then((output)=>{
             if (output.exists()) {
@@ -255,7 +259,9 @@ const ChatDisplay = (props) => {
                 const checkFriendTyping = typingFriends.filter(typing=> typing == props.chatFriendDetail.UserName)
                 if (checkFriendTyping.length > 0) {
                     setFriendTyping(()=>true)
-                    scrollToBottom()
+                    setTimeout(() => {
+                        scrollToBottom()
+                    }, 1000);
                 }
                 else{
                     setFriendTyping(()=>false)
@@ -272,6 +278,31 @@ const ChatDisplay = (props) => {
         })
     }, [props.chatInfo])
 
+    useEffect(() => {
+        const device = props.deviceUserAgent
+        onValue(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}/chat`), (output)=>{
+            console.log("as how", holdPropsChat.current);
+            if (output.exists()) {
+                const allResult = output.val()
+                const doubleArray = []
+                allResult?.map((result)=>{  
+                    const sender = Object.keys(result)[0]
+                    result[sender].progress = sent
+                    const checkExistence = holdChat.current.filter(user => user[sender]?.id == result[sender]?.id)
+                    if (checkExistence.length == 0) {
+                        const checkDouble = doubleArray.filter(user => user[sender]?.id == result[sender]?.id)
+                        if (checkDouble.length == 0) {
+                            checkExistence.push(result)
+                            
+                            setChatArray(prev=> [...prev, result])
+                        }
+                    }
+                })
+                set(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), null)
+            }
+        })
+    }, [props.chatInfo])
+    
 
     useEffect(() => {
         onValue(ref(db, `Users/${userName}/type`),(output)=>{
@@ -281,7 +312,9 @@ const ChatDisplay = (props) => {
                 const checkFriendTyping = typingFriends.filter(typing=> typing == props.chatFriendDetail.UserName)
                 if (checkFriendTyping.length > 0) {
                     setFriendTyping(()=>true)
-                    scrollToBottom()
+                    setTimeout(() => {
+                        scrollToBottom()
+                    }, 1000);
                 }
                 else{
                     setFriendTyping(()=>false)
@@ -301,6 +334,7 @@ const ChatDisplay = (props) => {
 
     useEffect(() => {
         saveChat(props.chatInfo, chatArray)
+        holdChat.current = chatArray
     }, [chatArray])
     const checkUser = useRef()
     useEffect(() => {
@@ -316,6 +350,27 @@ const ChatDisplay = (props) => {
                                     chatArray: "No message"
                                 })
                                 setChatArray(prev=>[...prev, ...output.val().chatArray])
+                                let messageToSend = output.val().chatArray
+                                props.otherDevices?.map((device)=>{
+                                    let messages = []
+                                    get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                    .then((msg)=>{
+                                        
+                                        if (msg.exists()) {
+                                            messages = msg.val()
+                                            messageToSend.map((forwardMsg)=>{
+                                                messages.push(forwardMsg)
+                                            })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                            else{
+                                                messageToSend.map((forwardMsg)=>{
+                                                    messages.push(forwardMsg)
+                                                })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                    })
+                                })
                             }
                             
                         }
@@ -370,18 +425,14 @@ const ChatDisplay = (props) => {
     }, [props.chatFriendDetail.UserName, userName])
 
     const reply = (id, user) =>{
-        console.log(id, user);
-        
         if (id && id != "") {
             const filterChat = chatArray.filter(friend => friend[user]?.id == id)
             if (filterChat && filterChat.length > 0) {
-                console.log(filterChat[0][user]);
                 setReplyMsgCon(()=>filterChat[0][user])
                 const check = {
                     id : filterChat[0][user].id,
                     user : user
                 }
-                console.log(check);
                 
                 setReplyMsg(()=>check)
             }
@@ -445,10 +496,8 @@ const ChatDisplay = (props) => {
                     setMicShow(()=>true)
                     sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                     const friendsList = props.mutualRender
-                    console.log(friendsList);
                     const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                     const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                    console.log(getOtherFriend);
                     
                     if (getFriend && getFriend.length > 0) {
                         props.setMutualRender([...getOtherFriend, getFriend[0]])
@@ -488,6 +537,35 @@ const ChatDisplay = (props) => {
                             })
                         }
                     })
+                    props.otherDevices?.map((device)=>{
+                        let messages = []
+                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                        .then((msg)=>{
+                            if (msg.exists()) {
+                                messages = msg.val()
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: vnData.current,
+                                        progress: sent,
+                                        reply:replyMsg,
+                                        id
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                            else{
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: vnData.current,
+                                        progress: sent,
+                                        reply:replyMsg,
+                                        id
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                        })
+                    })
                 })
             }
             else{
@@ -513,10 +591,8 @@ const ChatDisplay = (props) => {
                     setMicShow(()=>true)
                     sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
                     const friendsList = props.mutualRender
-                    console.log(friendsList);
                     const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                     const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                    console.log(getOtherFriend);
                     
                     if (getFriend && getFriend.length > 0) {
                         props.setMutualRender([...getOtherFriend, getFriend[0]])
@@ -562,6 +638,36 @@ const ChatDisplay = (props) => {
                             })
                         }
                     })
+                    props.otherDevices?.map((device)=>{
+                        let messages = []
+                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                        .then((msg)=>{
+                            if (msg.exists()) {
+                                messages = msg.val()
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: vnData.current,
+                                        progress: sent,
+                                        reply:replyMsg,
+                                        id
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                            else{
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: vnData.current,
+                                        progress: sent,
+                                        reply:replyMsg,
+                                        id
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                        })
+                    })
+                    
                 })
             }
         })
@@ -605,10 +711,8 @@ const ChatDisplay = (props) => {
                             setMicShow(()=>true)
                             sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                             const friendsList = props.mutualRender
-                            console.log(friendsList);
                             const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                             const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                            console.log(getOtherFriend);
                             
                             if (getFriend && getFriend.length > 0) {
                                 props.setMutualRender([...getOtherFriend, getFriend[0]])
@@ -665,10 +769,37 @@ const ChatDisplay = (props) => {
                                         })
                                     }
                                 })
+                                props.otherDevices?.map((device)=>{
+                                    let messages = []
+                                    get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                    .then((msg)=>{
+                                        if (msg.exists()) {
+                                            messages = msg.val()
+                                            messages.push({
+                                                [userName]: {
+                                                    prompt:message,
+                                                    reply:replyMsg,
+                                                    id
+                                                }
+                                            })
+                                            update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                        }
+                                        else{
+                                            messages.push({
+                                                [userName]: {
+                                                    prompt:message,
+                                                    reply:replyMsg,
+                                                    id
+                                                }
+                                            })
+                                            update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                        }
+                                    })
+                                })
                             })
                         })
                     }
-                    else{
+                    else{   
                             let tempData = output.val().chatArray
                             tempData.push({[userName]:{
                                 prompt:userPrompt.current.value,
@@ -692,11 +823,8 @@ const ChatDisplay = (props) => {
                                 setMicShow(()=>true)
                                 sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
                                 const friendsList = props.mutualRender
-                                console.log(friendsList);
                                 const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                                 const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                                console.log(getOtherFriend);
-                                
                                 if (getFriend && getFriend.length > 0) {
                                     props.setMutualRender([...getOtherFriend, getFriend[0]])
                                 }
@@ -758,6 +886,34 @@ const ChatDisplay = (props) => {
                                             })
                                         }
                                     })
+                                    props.otherDevices?.map((device)=>{
+                                        let messages = []
+                                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                        .then((msg)=>{
+                                            if (msg.exists()) {
+                                                messages = msg.val()
+                                                messages.push({
+                                                    [userName]: {
+                                                        prompt:message,
+                                                        reply:replyMsg,
+                                                        id
+                                                    }
+                                                })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                            else{
+                                                messages.push({
+                                                    [userName]: {
+                                                        prompt:message,
+                                                        reply:replyMsg,
+                                                        id
+                                                    }
+                                                })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                        })
+                                    })
+                                    
                                 })
                             })
                         }
@@ -825,10 +981,8 @@ const ChatDisplay = (props) => {
                         setMicShow(()=>true)
                         sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                         const friendsList = props.mutualRender
-                        console.log(friendsList);
                         const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                         const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                        console.log(getOtherFriend);
                         
                         if (getFriend && getFriend.length > 0) {
                             props.setMutualRender([...getOtherFriend, getFriend[0]])
@@ -881,6 +1035,37 @@ const ChatDisplay = (props) => {
                                     })
                                 }
                             })
+                            props.otherDevices?.map((device)=>{
+                                let messages = []
+                                get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                .then((msg)=>{
+                                    if (msg.exists()) {
+                                        messages = msg.val()
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:replyMsg,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                    else{
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:replyMsg,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                })
+                            })
                         })
                     })
                 }
@@ -920,10 +1105,8 @@ const ChatDisplay = (props) => {
                         setMicShow(()=>true)
                         sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
                         const friendsList = props.mutualRender
-                        console.log(friendsList);
                         const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
                         const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
-                        console.log(getOtherFriend);
                         
                         if (getFriend && getFriend.length > 0) {
                             props.setMutualRender([...getOtherFriend, getFriend[0]])
@@ -976,6 +1159,37 @@ const ChatDisplay = (props) => {
                                     })
                                 }
                             })
+                            props.otherDevices?.map((device)=>{
+                                let messages = []
+                                get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                .then((msg)=>{
+                                    if (msg.exists()) {
+                                        messages = msg.val()
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: "no med",
+                                                mediaType: mediaType,
+                                                reply:replyMsg,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                    else{
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:replyMsg,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                })
+                            })
                         })
                     })
                 }
@@ -993,7 +1207,6 @@ const ChatDisplay = (props) => {
     }
     const displayGallery = async(e) =>{
         const file = e.target.files[0]
-        console.log(file);
         if (file.type > 5000000) {
             alert("file size it too big")
             return
@@ -1005,8 +1218,6 @@ const ChatDisplay = (props) => {
             reader.addEventListener("load", (e)=>{
                 const bufferResult = e.target.result
                 const uint8Array = new Uint8Array(bufferResult)
-                console.log("here");
-                
                 setDisplayUrl(()=>uint8Array)
                 if (file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg") {
                     setMediaType(()=>"image")
@@ -1025,7 +1236,6 @@ const ChatDisplay = (props) => {
         })
         reader.readAsArrayBuffer(result.file)
         } catch (error) {
-            console.log(error);
             
         }
         
@@ -1101,7 +1311,6 @@ const ChatDisplay = (props) => {
         if (id && user) {
             const filterChat = chatArray.filter(friend => friend[user]?.id == id)
             if (filterChat && filterChat.length > 0) {
-                // console.log(filterChat[0][user]);
                 return(
                     <div className='repliedMsg' disabled onClick={()=>{locateReply(id)}}>
                         <div className='mediaParent'>
@@ -1119,9 +1328,7 @@ const ChatDisplay = (props) => {
         }
     }
 
-    const locateReply = (id) =>{
-        console.log('kkk');
-        
+    const locateReply = (id) =>{        
         const element = document.getElementById(id)
         element.scrollIntoView({ behavior: "auto",block:"nearest", inline:"start" })
         element.style.background = "#36323273"

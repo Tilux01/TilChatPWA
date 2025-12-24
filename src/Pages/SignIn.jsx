@@ -8,7 +8,7 @@ import email from "../images/download-file.png"
 import passwordImg from "../images/padlock.png"
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase,ref,push,set,get, query} from "firebase/database"
+import {getDatabase,ref,push,set,get, query, update} from "firebase/database"
 import { BrowserRouter as Router, Routes, Route,Navigate, useNavigate } from 'react-router-dom';
 
 
@@ -63,10 +63,29 @@ const SignIn = () => {
     else{
       get(ref(db, `Users/${UserName}`))
       .then((output)=>{
-        console.log(output.val());
         if (output.exists()) {
           if (output.val().Password == Password) {
             localStorage.setItem("TilChat",JSON.stringify({UserName: output.val().UserName,uniqueId: output.val().uniqueId,profileId: output.val().profileId, profilePic:output.val().profilePic}))
+            let devices = []
+            get(ref(db, `Devices/${UserName}`))
+            .then((output)=>{
+              if (output.exists) {
+                devices = output.val()
+                const userAgent = navigator.userAgent 
+                const filterDevice = devices.filter(device=> device != userAgent) 
+                filterDevice.push(userAgent)
+                update(ref(db, `Devices`),{
+                  [UserName] : filterDevice
+                })
+              }
+              else{
+                const userAgent = navigator.userAgent     
+                devices.push(userAgent)
+                update(ref(db, `Devices`),{
+                  [UserName] : devices
+                })
+              }
+            })
             alert(`Welcome ${UserName}`)
             setNavigateUser(true)
           }

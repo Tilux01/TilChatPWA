@@ -8,6 +8,8 @@ import { getAnalytics } from "firebase/analytics";
 import {getDatabase,ref,push,set,get, query, onValue, orderByChild, equalTo, orderByKey, update} from "firebase/database"
 import {reduceImageQualityToBase64} from "../ImageConverter"
 import { useNavigate } from 'react-router-dom'
+import loader from "../images/loading.png"
+
 
 
 
@@ -47,12 +49,12 @@ const Settings = (props) => {
     const [location, setLocation] = useState("")
     const [readReceipt, setReadReceipt] = useState(true)
     const [backupActive, setBackupActive] = useState(false)
+    const [loadProgress, setLoadProgess] = useState(null)
 
     const getLocationByIP = async () => {
         try {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
-            console.log(data);
             setLocation(data.country_name)
         } catch (error) {
             console.error('IP location error:', error);
@@ -65,8 +67,6 @@ const Settings = (props) => {
     }, [])
 
     useEffect(() => {
-        console.log(props.userCredentials.readReceipt);
-        
         setNameValue(props.userCredentials.FullName)
         setVirtualNameValue(props.userCredentials.FullName)
         setReadReceipt(props.userCredentials.readReceipt)
@@ -163,7 +163,6 @@ const Settings = (props) => {
 
     const updatePic = async() =>{
         const file = profileImgUpdate.current.files[0]
-        console.log(file);
         if (!file) return;
         if (file.size > 3008961) {
             alert("image size is too big")
@@ -206,6 +205,20 @@ const Settings = (props) => {
     const logOut = () =>{
         saveChat("friendsList", null)
         localStorage.removeItem("TilChat")
+        let devices = []
+        get(ref(db, `Devices/${props.userCredentials.UserName}`))
+        .then((output)=>{
+            console.log(output.val());
+            
+            if (output.exists) {
+                devices = output.val()
+                const userAgent = navigator.userAgent  
+                const filterDevice = devices.filter(device=> device != userAgent) 
+                update(ref(db, `Devices`),{
+                    [props.userCredentials.UserName] : filterDevice
+                })
+            }
+        })
         navigate("/signup")
     }
 
@@ -259,6 +272,7 @@ const Settings = (props) => {
 
     const backupArray = useRef([])
     const backUp = () =>{
+        setLoadProgess("Backing up, pls wait...")
         getAllKeys()
         .then((data)=>{
             data.map((output)=>{
@@ -271,11 +285,9 @@ const Settings = (props) => {
                     })
                 }
             })
-            // console.log(backupArray.current);
             backupArray.current.map((value)=>{
                 const DBKeys = Object.keys(value)[0]
-                // console.log(value);
-                
+                setLoadProgess("Backing up, pls wait...")
                 value[DBKeys].map((result, index)=>{
                     update(ref(db, `Backup/${props.userCredentials.UserName}/${DBKeys}/`),{
                         [index] : result
@@ -283,12 +295,11 @@ const Settings = (props) => {
                     .then(()=>{
                         backupArray.current = []
                         setBackupActive(false)
-                        console.log(index, result);
-                        
                     })
                 })
             })
-            alert("done")
+            setLoadProgess("Done")
+            setLoadProgess(null)
             // setBackupActive(true)
             // if (backupArray.current && backupArray.current.length > 0) {
             // }
@@ -298,13 +309,11 @@ const Settings = (props) => {
     }
 
     const restoreBackup = () =>{
+        setLoadProgess("Restoring backup, pls wait...")
         get(ref(db, `Backup/${props.userCredentials.UserName}`))
         .then((backup)=>{
-            alert("done")
-            console.log("backup", backup.val());
             if (backup.exists()) {      
                 const backupList = [Object.entries(backup.val())]
-                console.log(backupList);
                 const convertedArray = []
                 backupList[0].map((output, index)=>{
                     const listObj = {[output[0]]: output[1]}
@@ -312,17 +321,34 @@ const Settings = (props) => {
                 })
                 convertedArray.map((output)=>{
                     const key =  Object.keys(output)[0]
-                    console.log(output[key]);
                     saveChat(key, output[key])
                 })
             }
             
         })
+        .finally(()=>{
+            backupArray.current.map((value)=>{
+                const DBKeys = Object.keys(value)[0]
+                value[DBKeys].map((result, index)=>{
+                    update(ref(db, `Backup/${props.userCredentials.UserName}/${DBKeys}/`),{
+                        [index] : null
+                    })
+                    .then(()=>{
+                        backupArray.current = []
+                        setBackupActive(false)
+                    })
+                    .finally(()=>{
+                        setLoadProgess(null)
+                    })
+                })
+                alert("done")
+            })
+        })
     }
     return (
-        <div className='settings-overall'>
+        <div className='settings-overall' >
             <h1>Settings</h1>
-            <div className="scrollParent">
+            <div className="scrollParent" style={loadProgress? {pointerEvents:"none", filter:"brightness(.7) blur(1px)"} : null}>
                 <div className="profilePreview">
                     <input ref={profileImgUpdate} onChange={updatePic} style={{display:"none"}} type="file" name="profileImgUpload" id="profileImgUpload" accept='image/*'/>
                     <div className="imagePrev">
@@ -525,6 +551,14 @@ const Settings = (props) => {
                     <button className='log-out-btn' onClick={logOut}>Log Out</button>
                 </div>
             </div>
+            {
+                loadProgress?
+                <div className="loader">
+                    <img src={loader} alt="" />
+                    <p>{loadProgress}</p>
+                </div>
+                : null
+            }
         </div>
     )
 }

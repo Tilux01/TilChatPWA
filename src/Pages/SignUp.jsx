@@ -9,7 +9,7 @@ import edit from "../images/pen.png"
 import passwordImg from "../images/padlock.png"
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from "firebase/analytics";
-import {getDatabase,ref,push,set,get, query} from "firebase/database"
+import {getDatabase,ref,update,set,get} from "firebase/database"
 import { BrowserRouter as Router, Routes, Route,Navigate, useNavigate } from 'react-router-dom';
 import {reduceImageQualityToBase64} from "../ImageConverter"
 
@@ -198,6 +198,13 @@ const SignUp = () => {
                     type: {type:[]},
                     readReceipt: true
                   }
+                })
+
+                let devices = []
+                const userAgent = navigator.userAgent     
+                devices.push(userAgent)
+                update(ref(db, `Devices`),{
+                  [UserName.toLowerCase()] : devices
                 })
                 
                 localStorage.setItem("TilChat",JSON.stringify({UserName,uniqueId,profileId, profilePic}))

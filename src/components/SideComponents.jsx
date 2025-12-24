@@ -265,7 +265,7 @@ const SideComponents = (props) => {
                     })
                     .finally(()=>{
                         if (storageHold.length == 0 || storageHold == []) {
-                            holdData.map((data, index) => {
+                            holdData?.map((data, index) => {
                                 get(ref(db, `Users/${data}`))
                                 .then((output)=>{
                                     props.setMutualRender(M=>[...M,output.val()])
@@ -273,7 +273,7 @@ const SideComponents = (props) => {
                             })
                         }
                         else{
-                            holdData.map((data, index) => {
+                            holdData?.map((data, index) => {
                                 const segmentFind = storageHold.filter((friend)=>friend?.UserName == data)
                                 if (segmentFind.length == 0) {
                                     get(ref(db, `Users/${data}`))
@@ -319,7 +319,7 @@ const SideComponents = (props) => {
             if (data.val()) {
                 let holdData
                 holdData = data.val()
-                holdData.map((data, index) => {
+                holdData?.map((data, index) => {
                     get(ref(db, `Users/${data}`))
                     .then((output)=>{
                         props.setMutualRender(M=>[...M,output.val()])
@@ -336,22 +336,20 @@ const SideComponents = (props) => {
     onValue(ref(db, `Users/${userNameLoc?.UserName}/notifications`), (output) => {
             if (output.exists()) {
             const holdNotification = output.val();
-            console.log(holdNotification);
             set(ref(db, `Users/${userNameLoc?.UserName}/notifications`), null);
             let arrayList = props.mutualRender
             let checkArray = []
             holdNotification.map((note) => {
-                console.log("note");
                 const filterNote = arrayList.filter(friend=> note.sender != friend?.UserName)
                 const senderNote = arrayList.filter(friend=> note.sender == friend?.UserName)
                 if (filterNote && filterNote.length > 0) {
                     checkArray = filterNote
                     const friend = senderNote[0]
                     const pushFriend = friend
+                    
                     pushFriend.unreadMsg = true
                     checkArray.push(pushFriend)
                     arrayList = checkArray
-                    console.log(arrayList);
                     props.setMutualRender(()=>arrayList)
                 }
                 // if(props.chatInfo === userNameLoc.UserName+note.sender || 
