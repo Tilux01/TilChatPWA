@@ -220,60 +220,142 @@ const FriendsComponent = (props) => {
     const [firstGo, setFirstGo] = useState(false)
     const [secondGo, setSecondGo] = useState(false)
     const [msgGotten, setMsgGotten] = useState(false)
-    
-    const message = (output) =>{
-        if(window.innerWidth <= 800){
-            props.setChatState(()=>"chat")
-        }
-        const allList = props.mutualRender
-        const userIndex = allList.findIndex(friend=> friend.UserName == output.UserName)
-        console.log(userIndex);
-        props.setMutualRender(prev=>prev.map((data, i) =>
-            i == userIndex? {...data,unreadMsg: false} : data
-        ))
-        props.setChatFriendDetail(C=>output)    
-        props.setChatView(true)
-        const Msg1 = output.UserName + userCredentials.UserName
-        const Msg2 = userCredentials.UserName + output.UserName
-        let Msg;
-        let message1;
-        let message2;
-        get(ref(db,`Messages/${Msg1}`))
-        .then((output1)=>{
-            if(output1.exists()){
-                message1 = Msg1
+
+    const openDB = () => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('TilDB', 1)
+
+            request.onupgradeneeded = (event) => {
+            const db = event.target.result
+            if (!db.objectStoreNames.contains('chats')) {
+                db.createObjectStore('chats')
             }
-        }) 
-        get(ref(db,`Messages/${Msg2}`))
-        .then((output2)=>{
-            if (output2.exists()) {
-                message2 = Msg2
             }
-        })
-        .finally(()=>{
-            if(!message1 && !message2){
-                update(ref(db, `Messages/${Msg1}`),{
-                    message:"hello"
-                })
-                .then(()=>{
-                    props.setChatInfo(M=>Msg1)
-                    let mutuals = []
-                    let friendMutuals = []
-                })
-            }
-            else{
-                if(message1){
-                    
-                    props.setChatInfo(M=>message1)
-                    let mutuals;
-                    let friendMutual;
-                }
-                else if(message2){
-                    props.setChatInfo(M=>message2)
-                }
-            }
+
+            request.onsuccess = () => resolve(request.result)
+            request.onerror = () => reject(request.error)
         })
     }
+    const getChat = async(key) =>{
+        const db = await openDB()
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('chats', 'readonly')
+            const store = tx.objectStore('chats')
+            const request = store.get(key)
+            request.onsuccess = () => resolve(request.result || null)
+            request.onerror = () => reject(request.error)
+        })
+    }
+    
+    const message = (output) =>{
+            if (!props.userCredentials || !props.userCredentials?.UserName) {
+                return
+            }
+            const allList = props.mutualRender
+            const userIndex = allList.findIndex(friend=> friend?.UserName == output?.UserName)
+            props.setMutualRender(prev=>prev.map((data, i) =>
+                i == userIndex? {...data,unreadMsg: false} : data
+            ))
+            props.setChatFriendDetail(C=>output)
+            props.setChatView(true)
+            const Msg1 = output?.UserName + props.userCredentials?.UserName
+            const Msg2 = props.userCredentials?.UserName + output?.UserName
+            let Msg;
+            let message1;
+            let message2;
+            getChat(Msg1)
+            .then((output)=>{
+                if (output != props.chatInfo) {
+                    if (output) {
+                        props.setChatInfo(()=>Msg1)
+                    }
+                    else {
+                        getChat(Msg2)
+                        .then((output2)=>{
+                            if (output2) {
+                                props.setChatInfo(()=>Msg2)
+                            }
+                        })
+                    }
+                }
+            })
+            if(window.innerWidth <= 800){
+                props.setChatState(()=>"chat")
+            }
+            get(ref(db,`Messages/${Msg1}`))
+            .then((output1)=>{
+                if(output1.exists()){
+                    message1 = Msg1
+                }
+            })
+            .finally(()=>{
+                get(ref(db,`Messages/${Msg2}`))
+                .then((output2)=>{
+                    if (output2.exists()) {
+                        message2 = Msg2
+                    }
+                })
+                .finally(()=>{
+                    if(!message1 && !message2){
+                        update(ref(db, `Messages/${Msg1}`),{
+                            message:"hello"
+                        })
+                        .then(()=>{
+                            props.setChatInfo(M=>Msg1)
+                            let mutuals = []
+                            let friendMutuals = []
+                            get(ref(db,`Users/${props.userCredentials?.UserName}/mutualFriends`))
+                            .then((data)=>{
+                                if(data.exists()){
+                                    mutuals = data.val()
+                                }
+                                if(!(mutuals?.includes(output?.UserName))){
+                                    mutuals.push(output?.UserName)
+                                    update(ref(db, `Users/${props.userCredentials?.UserName}`),{
+                                        mutualFriends: mutuals
+                                    })
+                                }
+                            })
+                            get(ref(db,`Users/${output?.UserName}/mutualFriends`))
+                            .then((data)=>{
+                                if(data.exists()){
+                                    friendMutuals = data.val()
+                                } 
+                                if(!(friendMutuals?.includes(output?.UserName))){
+                                    friendMutuals.push(props.userCredentials?.UserName)
+                                    update(ref(db, `Users/${output?.UserName}`),{
+                                        mutualFriends: friendMutuals
+                                    })
+                                }
+                            })
+                        })
+                    }
+                    else{
+                        if(message1){
+                            props.setChatInfo(M=>message1)
+                            let mutuals;
+                            let friendMutual;
+                            get(ref(db,`Users/${props.userCredentials?.UserName}/mutualFriends`))
+                            .then((data)=>{
+                                mutuals = data.val()
+                                const findFriend = mutuals.find(friend=>
+                                    friend == output?.UserName
+                                )
+                                if(!findFriend || findFriend.length == 0){
+                                    mutuals.push(output?.UserName)
+                                    update(ref(db, `Users/${props.userCredentials?.UserName}/mutualFriends`),{
+                                        mutualFriends: mutuals
+                                    })
+                                }
+                            })
+                        }
+                        else if(message2){
+                            props.setChatInfo(M=>message2)
+                        }
+                    }
+                })
+            }) 
+        }
     const[mge, setMessage] = useState("")
 
     const [friendStatus, setFriendStatus] = useState("");
@@ -321,7 +403,7 @@ const FriendsComponent = (props) => {
                             if (friends?.length === 0) {
                                 return (
                                     <div id={`parent${index}`} className="friends" key={`empty-${index}`}>
-                                        <img src={output?.profilePic || userImg} alt="" />
+                                        <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                         <div>
                                             <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
                                             <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
@@ -349,7 +431,7 @@ const FriendsComponent = (props) => {
                                         
                                         return(
                                             <div id={`parent${index}`} className="friends" key={`nonfriend-${index}`}>
-                                                <img src={output?.profilePic} alt="" />
+                                                <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                                 <div>
                                                     <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
                                                     <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
@@ -363,7 +445,7 @@ const FriendsComponent = (props) => {
                                     else if(friendMatch?.Validate == true && outputMatch?.Validate == true){
                                         return (
                                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                                    <img src={output?.profilePic} alt="" />
+                                                    <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                                     <div>
                                                         <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
                                                         <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
@@ -377,7 +459,7 @@ const FriendsComponent = (props) => {
                                     else if (friendMatch?.Validate == true && outputMatch?.Validate == false) {
                                         return (
                                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                                    <img src={output?.profilePic} alt="" />
+                                                    <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                                     <div>
                                                         <p style={{ marginTop: "-15px" }}>{output?.FullName}</p>
                                                         <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output?.UserName}</small>
@@ -392,7 +474,7 @@ const FriendsComponent = (props) => {
                                 else{
                                     return (
                                             <div id={`parent${index}`} className="friends" key={`nonfriend-${index}`}>
-                                                <img src={output.profilePic} alt="" />
+                                                <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                                 <div>
                                                     <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
                                                     <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
@@ -410,7 +492,7 @@ const FriendsComponent = (props) => {
                         else{
                             return (
                                 <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                    <img src={output.profilePic} alt="" />
+                                    <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                     <div>
                                         <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
                                         <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
@@ -433,7 +515,7 @@ const FriendsComponent = (props) => {
                     if (output.Validate == false) {
                         return(
                             <div id={`parent${index}`} className="friends" key={`empty-${index}`}>
-                                <img src={output.profilePic} alt="" />
+                                <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
                                 <div>
                                     <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
                                     <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
@@ -450,18 +532,21 @@ const FriendsComponent = (props) => {
                 {props.mutualRender != []?<h3 style={{marginTop:"15px",color:"whitesmoke",fontSize:"27px"}}>Friends</h3>:null}
                 {
                     props.mutualRender.slice().reverse().map((output, index) => {
-                        return (
-                                <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
-                                    <img src={output.profilePic} alt="" />
-                                    <div>
-                                    <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
-                                    <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
-                                    <div className="Btn">
-                                        <button onClick={()=>{message(output)}} className='message-btn'>Message</button>
+                        if (output.UserName) {
+                            return (
+                                    <div id={`parent${index}`} className="friends" key={`friend-${index}`}>
+                                        <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
+                                        <div>
+                                            <p style={{ marginTop: "-15px" }}>{output.FullName}</p>
+                                            <small style={{ color: "white", position: "absolute", bottom: "10px" }}>@{output.UserName}</small>
+                                            <div className="Btn">
+                                                <button onClick={()=>{message(output)}} className='message-btn'>Message</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        )
+                            )
+                        }
+                        
                     })
                 }
             </div>

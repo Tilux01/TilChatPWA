@@ -280,27 +280,28 @@ const ChatDisplay = (props) => {
 
     useEffect(() => {
         const device = props.deviceUserAgent
-        onValue(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}/chat`), (output)=>{
-            console.log("as how", holdPropsChat.current);
-            if (output.exists()) {
-                const allResult = output.val()
-                const doubleArray = []
-                allResult?.map((result)=>{  
-                    const sender = Object.keys(result)[0]
-                    result[sender].progress = sent
-                    const checkExistence = holdChat.current.filter(user => user[sender]?.id == result[sender]?.id)
-                    if (checkExistence.length == 0) {
-                        const checkDouble = doubleArray.filter(user => user[sender]?.id == result[sender]?.id)
-                        if (checkDouble.length == 0) {
-                            checkExistence.push(result)
-                            
-                            setChatArray(prev=> [...prev, result])
+        if (holdPropsChat.current) {
+            onValue(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}/chat`), (output)=>{
+                console.log("as how", holdPropsChat.current);
+                if (output.exists()) {
+                    const allResult = output.val()
+                    const doubleArray = []
+                    allResult?.map((result)=>{  
+                        const sender = Object.keys(result)[0]
+                        result[sender].progress = sent
+                        const checkExistence = holdChat.current.filter(user => user[sender]?.id == result[sender]?.id)
+                        if (checkExistence.length == 0) {
+                            const checkDouble = doubleArray.filter(user => user[sender]?.id == result[sender]?.id)
+                            if (checkDouble.length == 0) {
+                                doubleArray.push(result)
+                                setChatArray(prev=> [...prev, result])
+                            }
                         }
-                    }
-                })
-                set(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), null)
-            }
-        })
+                    })
+                    set(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}`), null)
+                }
+            })
+        }
     }, [props.chatInfo])
     
 

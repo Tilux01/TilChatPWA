@@ -4,6 +4,7 @@ import archive from "../images/archive.png"
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from "firebase/analytics";
 import more from "../images/more.png"
+import userImg from "../images/user.png"
 import {getDatabase,ref,push,set,get, query, onValue, orderByChild, equalTo, orderByKey,update,startAt,endAt} from "firebase/database"
 import { BrowserRouter as Router, Routes, Route,Navigate, useNavigate } from 'react-router-dom';
 
@@ -212,16 +213,20 @@ const Chats = (props) => {
             </div>
             <div className="chats-parent">
                 {
-                    props.chatSearchFilter.slice().reverse().map((output,index)=>(  
-                        <div className='chat' key={index} onClick={()=>message(output)}>
-                            <img src={output?.profilePic} alt="" />
-                            <div style={{display:"flex",flexDirection:"column"}}>
-                                <p>{output?.FullName}</p>
-                                <small style={{color:'whitesmoke'}}>@{output?.UserName}</small>
-                                {output?.unreadMsg? <main className='unread'></main>: null}
-                            </div>
-                        </div>
-                    ))
+                    props.chatSearchFilter.slice().reverse().map((output,index)=>{ 
+                        if (output.UserName) {
+                            return(
+                                <div className='chat' key={index} onClick={()=>message(output)}>
+                                    <img src={output?.profilePic == "/src/images/user.png" || output?.profilePic == "/assets/user.png"? userImg: output?.profilePic} alt="" />
+                                    <div style={{display:"flex",flexDirection:"column"}}>
+                                        <p>{output?.FullName}</p>
+                                        <small style={{color:'whitesmoke'}}>@{output?.UserName}</small>
+                                        {output?.unreadMsg? <main className='unread'></main>: null}
+                                    </div>
+                                </div>
+                            )
+                        }
+                    })
                 }
             </div>
         </div>
