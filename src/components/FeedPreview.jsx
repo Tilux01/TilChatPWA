@@ -18,33 +18,40 @@ const FeedPreview = (props) => {
     const changePage = () => {
         props.setViewState("ChatBot")
     }
+    const changeShowType = () =>{ 
+        if(window.innerWidth <= 800){
+            props.setChatState(()=>"sider")
+        }
+    }
 return (
     <div className='feedPreview'>
         {/* <img src={feed[0].urlToImage} className='backgroundImg' /> */}
         <header>
             <div className="profile">
-                <img src={profileArrow} alt="" className='navigateArrow'/>
+                <img src={profileArrow} onClick={changeShowType} alt="" className='navigateArrow'/>
                 <img src={profileImg} alt="" />
-                <p>{userNameLoc.UserName}</p>
+                <p>{userNameLoc?.UserName}</p>
             </div>
         </header>
         <div className="previewParent">
-            <small>{props.feedObject.name}</small>
-            <div className="headline">
-                <h1>{props.feedObject.title}</h1>
-                <button onClick={()=>{openNews(props.feedObject.url)}}>Read News</button>
-            </div>
-            <div className='imageParent'>
-                <img src={props.feedObject.urlToImage} className='image' />
-            </div>
-            <div className='source'>
-                <h6>{props.feedObject.author}</h6>
-                <h6>@{props.feedObject.source.name}</h6>
-            </div>
-            <div className='contentParent'>
-                <p className='description'>{props.feedObject.description}</p>
-                <p className='content'>{props.feedObject.content}</p>
-                <button onClick={()=>{openNews(props.feedObject.url)}}>Read News</button>
+            <div className="scrollParent">
+                <small>{props.feedObject?.name}</small>
+                <div className="headline">
+                    <h1>{props.feedObject?.title}</h1>
+                    <button onClick={()=>{openNews(props.feedObject?.url)}}>Read News</button>
+                </div>
+                <div className='imageParent'>
+                    <img src={props.feedObject?.image} className='image' />
+                </div>
+                <div className='source'>
+                    <h6>{props.feedObject?.author}</h6>
+                    <h6>@{props.feedObject?.source?.name}</h6>
+                </div>
+                <div className='contentParent'>
+                    <p className='description'>{props.feedObject?.description}</p>
+                    <p className='content'>{props.feedObject?.content}</p>
+                    <button onClick={()=>{openNews(props.feedObject?.url)}}>Read News</button>
+                </div>
             </div>
         </div>
     </div> 

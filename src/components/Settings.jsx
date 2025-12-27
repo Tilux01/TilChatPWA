@@ -352,7 +352,7 @@ const Settings = (props) => {
                 <div className="profilePreview">
                     <input ref={profileImgUpdate} onChange={updatePic} style={{display:"none"}} type="file" name="profileImgUpload" id="profileImgUpload" accept='image/*'/>
                     <div className="imagePrev">
-                            <img src={props.userCredentials.profilePic || userImg} alt="" className='profileImg'/>
+                            <img src={props.userCredentials.profilePic == "/src/images/user.png" || props.userCredentials.profilePic == "/assets/user.png"? userImg: props.userCredentials.profilePic} alt="" className='profileImg'/>
                             <label htmlFor="profileImgUpload">
                                 <img src={editImg} alt="" className="editIcon" />
                             </label>

@@ -193,8 +193,9 @@ const Status = (props) => {
     }
 
     useEffect(() => {
-        axios.get(`https://newsapi.org/v2/everything?q=sport&sortBy=popularity&apiKey=41181213ecd644ae9230d93ad0b40544`)
+        axios.get(`https://gnews.io/api/v4/top-headlines?category=%27%20+%20category%20+%20%27&lang=en&country=ng&max=10&apikey=89bf5943fba1916d39f48ea649942452`)
             .then((output)=>{
+                console.log(output);
                 
                 props.setFeed(output.data.articles)
             })
@@ -317,7 +318,7 @@ const Status = (props) => {
                         {
                             props.feed.map((output)=>(
                                 <div className="new" onClick={()=>{feedPreviewShow(output)}}>
-                                        <img src={output.urlToImage? output.urlToImage : feedIcon} alt="" />
+                                        <img src={output.image? output.image : feedIcon} alt="" />
                                     <p>{output.title}</p>
                                 </div>
                                 

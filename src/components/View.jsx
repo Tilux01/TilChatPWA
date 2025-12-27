@@ -28,7 +28,7 @@ const View = (props) => {
   else if(props.ViewState == "VideoPlayer"){
     return(
       <main style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"100%"}}>
-        <VideoPlayer setChatState={props.setChatState} userCredentials={props.userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} iframeLink={props.iframeLink}/>
+        <VideoPlayer setChatState={props.setChatState} userCredentials={props.userCredentials} setViewState={props.setViewState} ViewState={props.ViewState} setIframeLink={props.setIframeLink} iframeLink={props.iframeLink}/>
       </main>
     )
   }
@@ -41,7 +41,7 @@ const View = (props) => {
   }
   else if(props.ViewState == "feed"){
     return(
-      <main style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"100%"}}>
+      <main style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"100%", height:"100%"}}>
         <FeedPreview setChatState={props.setChatState} setViewState={props.setViewState} ViewState={props.ViewState} feedObject={props.feedObject} setFeedObject={props.setFeedObject}/>
       </main>
     )
