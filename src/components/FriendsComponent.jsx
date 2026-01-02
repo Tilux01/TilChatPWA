@@ -246,8 +246,22 @@ const FriendsComponent = (props) => {
             request.onerror = () => reject(request.error)
         })
     }
+
+    const clearOpt = () =>{
+        document.querySelectorAll(".optionList").forEach((opt)=>{
+            opt.style.display = "none"
+        })
+        document.querySelectorAll(".moreIcon").forEach((icon)=>{
+            icon.style.display = "block"
+        })
+        document.querySelectorAll(".request").forEach((chat)=>{
+            chat.style.filter = "blur(0px)"
+            chat.style.pointerEvent = "d"
+        })
+    }
     
     const message = (output) =>{
+            clearOpt()
             if (!props.userCredentials || !props.userCredentials?.UserName) {
                 return
             }

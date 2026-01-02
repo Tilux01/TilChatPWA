@@ -34,6 +34,7 @@ import close from "../images/ad6f8ce5-b6ba-4bde-b4af-a6d0b3db434c.png"
 import recordVoice from "../images/mic.png"
 import stopVoiceRecording from "../images/stop-button.png"
 import {reduceMediaQualityToFile, formatBytes} from "../fileReducer.js"
+import more from "../images/more.png"
 
 
 
@@ -166,7 +167,7 @@ const ChatDisplay = (props) => {
             const blob = new Blob(chunks.current, {type: "audio/webm;codecs=opus"})
             const reader = new FileReader
             reader.addEventListener("load", (e)=>{
-                vnData.current =  e.target.result
+                vnData.current =  e?.target?.result
             })
             reader.readAsDataURL(blob)
             const url = URL.createObjectURL(blob)
@@ -274,6 +275,7 @@ const ChatDisplay = (props) => {
             else{
                 setFriendTyping(()=>false)
             }
+            clearOpt()
         })
         })
     }, [props.chatInfo])
@@ -281,28 +283,31 @@ const ChatDisplay = (props) => {
     useEffect(() => {
         const device = props.deviceUserAgent
         if (holdPropsChat.current) {
-            onValue(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}/chat`), (output)=>{
-                console.log("as how", holdPropsChat.current);
-                if (output.exists()) {
-                    const allResult = output.val()
-                    const doubleArray = []
-                    allResult?.map((result)=>{  
-                        const sender = Object.keys(result)[0]
-                        result[sender].progress = sent
-                        const checkExistence = holdChat.current.filter(user => user[sender]?.id == result[sender]?.id)
-                        if (checkExistence.length == 0) {
-                            const checkDouble = doubleArray.filter(user => user[sender]?.id == result[sender]?.id)
-                            if (checkDouble.length == 0) {
-                                doubleArray.push(result)
-                                setChatArray(prev=> [...prev, result])
+            if (holdPropsChat.current == props.chatFriendDetail.UserName + userName || holdPropsChat.current == userName + props.chatFriendDetail.UserName) {
+                onValue(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}/chat`), (output)=>{
+                    console.log("as how", holdPropsChat.current);
+                    if (output.exists()) {
+                            
+                        const allResult = output.val()
+                        const doubleArray = []
+                        allResult?.map((result)=>{  
+                            const sender = Object.keys(result)[0]
+                            result[sender].progress = sent
+                            const checkExistence = holdChat.current.filter(user => user[sender]?.id == result[sender]?.id)
+                            if (checkExistence.length == 0) {
+                                const checkDouble = doubleArray.filter(user => user[sender]?.id == result[sender]?.id)
+                                if (checkDouble.length == 0) {
+                                    doubleArray.push(result)
+                                    setChatArray(prev=> [...prev, result])
+                                }
                             }
-                        }
-                    })
-                    set(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}`), null)
-                }
-            })
+                        })
+                        set(ref(db, `DevicesMessages/${userName}/"${device}"/${holdPropsChat.current}`), null)
+                    }
+                })
+            }
         }
-    }, [props.chatInfo])
+    }, [props.chatInfo]) 
     
 
     useEffect(() => {
@@ -333,11 +338,81 @@ const ChatDisplay = (props) => {
         })
     }, [userName, props.chatFriendDetail])
 
+    const resendChat = (output) =>{
+        if (output[`${userName}`].voiceNote) {
+            reSendVN(output)
+        }
+        else if(output[`${userName}`].media && output[`${userName}`].mediaType){
+            reSendMediaChat(output)
+        }
+        else{
+            reSendChat(output)
+        }
+    }
+    const chatDuplicate = useRef()
+
+
     useEffect(() => {
         saveChat(props.chatInfo, chatArray)
         holdChat.current = chatArray
+        holdChat.current
+        console.log(chatArray);
+        
+        if (chatArray && chatArray.length > 0) {
+            chatArray.map((chat)=>{
+                if (chat) {
+                    const obj = Object.keys(chat)
+                    let user 
+                    if (obj && obj.length == 0) {
+                        user = obj[0]
+                    }
+                    if (user) {
+                        if (chat[user]?.progress == sending) {
+                            console.log(chat);
+                            resendChat(chat)
+                        }
+                    }
+                }
+            })
+             const ids = new Set();
+        let hasDuplicates = false
+        
+        chatArray.forEach(item => {
+            if (item) {
+                const key = Object.keys(item)[0];
+            const id = item[key]?.id
+            if (id) {
+                if (ids.has(id)) hasDuplicates = true;
+                ids.add(id)
+            }
+            }
+        })
+        if (hasDuplicates) {
+            console.log("Found duplicates, cleaning up...");
+            setTimeout(() => {
+                setChatArray(prev => {
+                    const seen = new Set()
+                    const unique = []
+                    
+                    prev.forEach(item => {
+                        const key = Object.keys(item)[0];
+                        const id = item[key]?.id;
+                        
+                        if (id && !seen.has(id)) {
+                            seen.add(id)
+                            unique.push(item)
+                        }
+                    })
+                    
+                    return unique
+                })
+            }, 0)
+        }
+        }
     }, [chatArray])
-    const checkUser = useRef()
+    const checkDuplicate = () =>{
+        
+    }
     useEffect(() => {
         propsValue.current = props.chatInfo
         const requestValue = onValue(ref(db,"Messages/"+props.chatInfo+"/"),(output)=>{
@@ -382,14 +457,16 @@ const ChatDisplay = (props) => {
                         .then((receipt)=>{
                             if (!receipt.exists() || receipt.val() != false) {
                                 setChatArray(prev => prev.map(item => {
-                                    if (item[userName]) {
-                                        return {
-                                            ...item,
-                                                [userName]: {
-                                                ...item[userName],
-                                                progress: item[userName].progress === sent || item[userName].progress === online ? seen : item[userName].progress
-                                            }
-                                        };
+                                    if (item) {
+                                        if (item[userName]) {
+                                            return {
+                                                ...item,
+                                                    [userName]: {
+                                                    ...item[userName],
+                                                    progress: item[userName].progress === sent || item[userName].progress === online ? seen : item[userName].progress
+                                                }
+                                            };
+                                        }
                                     }
                                     return item;
                                 }));
@@ -648,7 +725,6 @@ const ChatDisplay = (props) => {
                                 messages.push({
                                     [userName]: {
                                         voiceNote: vnData.current,
-                                        progress: sent,
                                         reply:replyMsg,
                                         id
                                     }
@@ -659,9 +735,209 @@ const ChatDisplay = (props) => {
                                 messages.push({
                                     [userName]: {
                                         voiceNote: vnData.current,
-                                        progress: sent,
                                         reply:replyMsg,
                                         id
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                        })
+                    })
+                    
+                })
+            }
+            clearOpt()
+        })
+    }
+
+    const reSendVN = (param) =>{
+        get(ref(db, "Messages/"+props.chatInfo))
+        .then((output)=>{
+            // const random = randomGenerate()
+            if(!output.val().chatArray || output.val().chatArray == "No message" || typeof(output.val().message) == "string"){
+                // setChatArray(prev=>[...prev, {[userName]:{
+                //     voiceNote: vnData.current,
+                //     progress: sending,
+                //     reply:replyMsg,
+                //     id
+                // }}])
+                set(ref(db,"Messages/"+props.chatInfo),{
+                    chatArray: [{[userName]:{
+                        voiceNote: param[`${userName}`].voiceNote,
+                        reply: param[`${userName}`].reply,
+                        id: param[`${userName}`].id
+                    }}]
+                })
+                .then(()=>{
+                    setMediaOption(()=>true)
+                    setMediaOption(()=>false)
+                    setLoading(()=>false)
+                    setMicShow(()=>true)
+                    sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                    const friendsList = props.mutualRender
+                    const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                    const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                    
+                    if (getFriend && getFriend.length > 0) {
+                        props.setMutualRender([...getOtherFriend, getFriend[0]])
+                    }
+                    set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                        user: userName
+                    })
+                    alert("done")
+                    // setChatArray((prev)=>prev.slice(0, -1))
+                    // setChatArray(prev=>[...prev, {[userName]:{
+                    //     voiceNote: vnData.current,
+                    //     progress: sent,
+                    //     reply:replyMsg,
+                    //     id
+                    // }}])
+                })
+                .finally(()=>{
+                    get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                    .then((result)=>{
+                        let friendNotifications = []
+                        const valueToPush = {
+                            prompt: `${userName} sent you a voice note`,
+                            sender: userName,
+                            reply: param[`${userName}`].reply,
+                        }
+                        if (result.exists()) {
+                            friendNotifications = result.val()
+                            friendNotifications.push(valueToPush)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                        else{
+                            friendNotifications = []
+                            friendNotifications.push(valueToPush)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                    })
+                    props.otherDevices?.map((device)=>{
+                        let messages = []
+                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                        .then((msg)=>{
+                            if (msg.exists()) {
+                                messages = msg.val()
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: param[`${userName}`].voiceNote,
+                                        reply: param[`${userName}`].reply,
+                                        id: param[`${userName}`].id,
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                            else{
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: param[`${userName}`].voiceNote,
+                                        reply: param[`${userName}`].reply,
+                                        id: param[`${userName}`].id,
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                        })
+                    })
+                })
+            }
+            else{
+                let tempData = output.val().chatArray
+                tempData.push({[userName]:{
+                    voiceNote: param[`${userName}`].voiceNote,
+                    reply: param[`${userName}`].reply,
+                    id: param[`${userName}`].id,
+                }})
+                // setChatArray(prev=>[...prev, {[userName]:{
+                //     voiceNote: vnData.current,
+                //     progress: sending,
+                //     reply:replyMsg,
+                //     id
+                // }}])
+                set(ref(db,"Messages/"+props.chatInfo),{
+                    chatArray: tempData
+                })
+                .then(()=>{
+                    setMediaOption(()=>true)
+                    setMediaOption(()=>false)
+                    setLoading(()=>false)
+                    setMicShow(()=>true)
+                    sendToNodeServer(props.chatFriendDetail.UserName, "TilChat", `${userName} sent you a voice note`)
+                    const friendsList = props.mutualRender
+                    const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                    const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                    
+                    if (getFriend && getFriend.length > 0) {
+                        props.setMutualRender([...getOtherFriend, getFriend[0]])
+                    }
+                    const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
+                    let randomValue = ""
+                    for (let index = 0; index < 12; index++) {
+                        const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+                        randomValue = randomValue + generateRandom
+                    }
+                    set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                        user: randomValue
+                    })
+                    alert("done")
+                    // setChatArray((prev)=>prev.slice(0, -1))
+                    // setChatArray(prev=>[...prev, {[userName]:{
+                    //     voiceNote: vnData.current,
+                    //     progress: sent,
+                    //     reply:replyMsg,
+                    //     id
+                    // }}])
+                })
+                .finally(()=>{
+                    get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                    .then((result)=>{
+                        let friendNotifications = []
+                        const valueToPush = {
+                            prompt: `${userName} sent you a voice note`,
+                            sender: userName,
+                            reply:param[`${userName}`].reply
+                        }
+                        if (result.exists()) {
+                            friendNotifications = result.val()
+                            friendNotifications.push(valueToPush)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                        else{
+                            friendNotifications = []
+                            friendNotifications.push(valueToPush)
+                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                notifications : friendNotifications
+                            })
+                        }
+                    })
+                    props.otherDevices?.map((device)=>{
+                        let messages = []
+                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                        .then((msg)=>{
+                            if (msg.exists()) {
+                                messages = msg.val()
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: param[`${userName}`].voiceNote,
+                                        reply: param[`${userName}`].reply,
+                                        id: param[`${userName}`].id,
+                                    }
+                                })
+                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                            }
+                            else{
+                                messages.push({
+                                    [userName]: {
+                                        voiceNote: param[`${userName}`].voiceNote,
+                                        reply: param[`${userName}`].reply,
+                                        id: param[`${userName}`].id,
                                     }
                                 })
                                 update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
@@ -681,25 +957,19 @@ const ChatDisplay = (props) => {
             setReplyMsg(()=>null)
             setLoading(()=>true)
             const message = userPrompt.current.value
-            if(message){
+            if(message || message != " "){
                 get(ref(db, "Messages/"+props.chatInfo))
                 .then((output)=>{
                     if(!output.val()?.chatArray || output.val()?.chatArray == "No message" || typeof(output.val().message) == "string"){
                         setChatArray(prev=>[...prev, {[userName]:{
                             prompt:message,
                             progress: sending,
-                            media: null,
-                            mediaType: null,
-                            mediaLink: null,
                             reply:replyMsg,
                             id
                         }}])
                         set(ref(db,"Messages/"+props.chatInfo),{
                             chatArray: [{[userName]:{
                                 prompt:message,
-                                media: null,
-                                mediaType: null,
-                                mediaLink: null,
                                 reply:replyMsg,
                                 id
                             }}]
@@ -721,16 +991,20 @@ const ChatDisplay = (props) => {
                             set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                                 user: userName
                             })
-                            setChatArray((prev)=>prev.slice(0, -1))
-                            setChatArray(prev=>[...prev, {[userName]:{
-                                prompt:message,
-                                progress: sent,
-                                media: null,
-                                mediaType: null,
-                                mediaLink: null,
-                                reply:replyMsg,
-                                id
-                            }}])
+                            setChatArray(prev=>{
+                                return prev.map((chat)=>{
+                                    const user = Object.keys(chat)[0]
+                                    console.log(user);
+                                    if (chat[user]?.id == id) {
+                                        return{
+                                            [user]:{
+                                            ...chat[user],
+                                            progress: sent,
+                                        }}
+                                    }
+                                    return chat;
+                                })
+                            })
                         })
                         .finally(()=>{
                             get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
@@ -838,16 +1112,20 @@ const ChatDisplay = (props) => {
                                 set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                                     user: randomValue
                                 })
-                                setChatArray((prev)=>prev.slice(0, -1))
-                                setChatArray(prev=>[...prev, {[userName]:{
-                                    prompt:message,
-                                    progress: sent,
-                                    media: null,
-                                    mediaType: null,
-                                    mediaLink: null,
-                                    reply:replyMsg,
-                                    id
-                                }}])
+                                setChatArray(prev=>{
+                                    return prev.map((chat)=>{
+                                        const user = Object.keys(chat)[0]
+                                        console.log(user);
+                                        if (chat[user]?.id == id) {
+                                            return{
+                                                [user]:{
+                                                ...chat[user],
+                                                progress: sent,
+                                            }}
+                                        }
+                                        return chat;
+                                    })
+                                })
                             })
                             .finally(()=>{
                                 get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
@@ -920,9 +1198,255 @@ const ChatDisplay = (props) => {
                         }
                 })
                 scrollToBottom()
+                clearOpt()
             }
         }
     }
+
+    const reSendChat = (param) =>{
+        const id = param[`${userName}`].id
+        if (!loading) {
+            setReplyMsg(()=>null)
+            setLoading(()=>true)
+            const message = param[`${userName}`].prompt
+            if(message){
+                get(ref(db, "Messages/"+props.chatInfo))
+                .then((output)=>{
+                    if(!output.val()?.chatArray || output.val()?.chatArray == "No message" || typeof(output.val().message) == "string"){
+                        set(ref(db,"Messages/"+props.chatInfo),{
+                            chatArray: [{[userName]:{
+                                prompt:message,
+                                reply:param[`${userName}`].reply,
+                                id
+                            }}]
+                        })
+                        .then(()=>{
+                            setMediaOption(()=>true)
+                            setMediaOption(()=>false)
+                            setLoading(()=>false)
+                            setMicShow(()=>true)
+                            sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                            const friendsList = props.mutualRender
+                            const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                            const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                            
+                            if (getFriend && getFriend.length > 0) {
+                                props.setMutualRender([...getOtherFriend, getFriend[0]])
+                            }
+                            set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                                user: userName
+                            })
+                            setChatArray(prev=>{
+                                return prev.map((chat)=>{
+                                    const user = Object.keys(chat)[0]
+                                    console.log(user);
+                                    if (chat[user]?.id == id) {
+                                        return{
+                                            [user]:{
+                                            ...chat[user],
+                                            progress: sent,
+                                        }}
+                                    }
+                                    return chat;
+                                })
+                            })
+                            // setChatArray((prev)=>prev.slice(0, -1))
+                            // setChatArray(prev=>[...prev, {[userName]:{
+                            //     prompt:message,
+                            //     progress: sent,
+                            //     media: null,
+                            //     mediaType: null,
+                            //     mediaLink: null,
+                            //     reply:replyMsg,
+                            //     id
+                            // }}])
+                        })
+                        .finally(()=>{
+                            get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
+                            .then((output)=>{
+                                let typingUsers = []
+                                if (output.exists()) {
+                                    typingUsers = output.val()
+                                    const checkType = typingUsers.filter(typer=> typer != userName)
+                                    update(ref(db, `Users/${props.chatFriendDetail.UserName}/type`),{
+                                        type: checkType
+                                    })
+                                } 
+                            })
+                            .finally(()=>{
+                                get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                                .then((result)=>{
+                                    let friendNotifications = []
+                                    const valueToPush = {
+                                        prompt: message,
+                                        sender: userName,
+                                        reply:param[`${userName}`].reply,
+                                    }
+                                    if (result.exists()) {
+                                        friendNotifications = result.val()
+                                        friendNotifications.push(valueToPush)
+                                        update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                            notifications : friendNotifications
+                                        })
+                                    }
+                                    else{
+                                        friendNotifications = []
+                                        friendNotifications.push(valueToPush)
+                                        update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                            notifications : friendNotifications
+                                        })
+                                    }
+                                })
+                                props.otherDevices?.map((device)=>{
+                                    let messages = []
+                                    get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                    .then((msg)=>{
+                                        if (msg.exists()) {
+                                            messages = msg.val()
+                                            messages.push({
+                                                [userName]: {
+                                                    prompt:message,
+                                                    reply:param[`${userName}`].reply,
+                                                    id
+                                                }
+                                            })
+                                            update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                        }
+                                        else{
+                                            messages.push({
+                                                [userName]: {
+                                                    prompt:message,
+                                                    reply:param[`${userName}`].reply,
+                                                    id
+                                                }
+                                            })
+                                            update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                        }
+                                    })
+                                })
+                            })
+                        })
+                    }
+                    else{   
+                            let tempData = output.val().chatArray
+                            tempData.push({[userName]:{
+                                prompt:message,
+                                reply:param[`${userName}`].reply,
+                                id
+                            }})
+                            set(ref(db,"Messages/"+props.chatInfo),{
+                                chatArray: tempData
+                            })
+                            .then(()=>{
+                                userPrompt.current.value = ""
+                                setMediaOption(()=>true)
+                                setMediaOption(()=>false)
+                                setLoading(()=>false)
+                                setMicShow(()=>true)
+                                sendToNodeServer(props.chatFriendDetail.UserName, userName, message)
+                                const friendsList = props.mutualRender
+                                const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                                const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                                if (getFriend && getFriend.length > 0) {
+                                    props.setMutualRender([...getOtherFriend, getFriend[0]])
+                                }
+                                const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
+                                let randomValue = ""
+                                for (let index = 0; index < 12; index++) {
+                                    const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+                                    randomValue = randomValue + generateRandom
+                                }
+                                set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                                    user: randomValue
+                                })
+                                setChatArray(prev=>{
+                                    return prev.map((chat)=>{
+                                        const user = Object.keys(chat)[0]
+                                        console.log(user);
+                                        if (chat[user]?.id == id) {
+                                            return{
+                                                [user]:{
+                                                ...chat[user],
+                                                progress: sent,
+                                            }}
+                                        }
+                                    })
+                                })
+                            })
+                            .finally(()=>{
+                                get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
+                                .then((output)=>{
+                                    let typingUsers = []
+                                    if (output.exists()) {
+                                        typingUsers = output.val()
+                                        const checkType = typingUsers.filter(typer=> typer != userName)
+                                        update(ref(db, `Users/${props.chatFriendDetail.UserName}/type`),{
+                                            type: checkType
+                                        })
+                                    } 
+                                })
+                                .finally(()=>{
+                                    get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                                    .then((result)=>{
+                                        let friendNotifications = []
+                                        const valueToPush = {
+                                            prompt: message,
+                                            sender: userName,
+                                            reply:  param[`${userName}`].reply
+                                        }
+                                        if (result.exists()) {
+                                            friendNotifications = result.val()
+                                            friendNotifications.push(valueToPush)
+                                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                                notifications : friendNotifications
+                                            })
+                                        }
+                                        else{
+                                            friendNotifications = []
+                                            friendNotifications.push(valueToPush)
+                                            update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                                notifications : friendNotifications
+                                            })
+                                        }
+                                    })
+                                    props.otherDevices?.map((device)=>{
+                                        let messages = []
+                                        get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                        .then((msg)=>{
+                                            if (msg.exists()) {
+                                                messages = msg.val()
+                                                messages.push({
+                                                    [userName]: {
+                                                        prompt:message,
+                                                        reply:param[`${userName}`].reply,
+                                                        id
+                                                    }
+                                                })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                            else{
+                                                messages.push({
+                                                    [userName]: {
+                                                        prompt:message,
+                                                        reply:param[`${userName}`].reply,
+                                                        id
+                                                    }
+                                                })
+                                                update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                            }
+                                        })
+                                    })
+                                    
+                                })
+                            })
+                        }
+                })
+                scrollToBottom()
+            }
+        }
+    }
+
+
     const sendMediaChat = () =>{
         const random = randomGenerate()
         const id = `${userName}${random}`
@@ -991,15 +1515,19 @@ const ChatDisplay = (props) => {
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
-                        setChatArray((prev)=>prev.slice(0, -1))
-                        setChatArray(prev=>[...prev, {[userName]:{
-                            progress: sent,
-                            prompt:message,
-                            media: displayUrl,
-                            mediaType: mediaType,
-                            reply:replyMsg,
-                            id
-                        }}])
+                         setChatArray(prev=>{
+                            return prev.map((chat)=>{
+                                const user = Object.keys(chat)[0]
+                                console.log(user);
+                                if (chat[user]?.id == id) {
+                                    return{
+                                        [user]:{
+                                        ...chat[user],
+                                        progress: sent,
+                                    }}
+                                }
+                            })
+                        })
                     })
                     .finally(()=>{
                         get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
@@ -1115,15 +1643,19 @@ const ChatDisplay = (props) => {
                         set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
                             user: randomValue
                         })
-                        setChatArray((prev)=>prev.slice(0, -1))
-                        setChatArray(prev=>[...prev, {[userName]:{
-                            progress: sent,
-                            prompt:message,
-                            mediaType: mediaType,
-                            media: displayUrl,
-                            reply: replyMsg,
-                            id
-                        }}])
+                         setChatArray(prev=>{
+                            return prev.map((chat)=>{
+                                const user = Object.keys(chat)[0]
+                                console.log(user);
+                                if (chat[user]?.id == id) {
+                                    return{
+                                        [user]:{
+                                        ...chat[user],
+                                        progress: sent,
+                                    }}
+                                }
+                            })
+                        })
                     })
                     .finally(()=>{
                         get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
@@ -1196,8 +1728,294 @@ const ChatDisplay = (props) => {
                 }
             })
             scrollToBottom()
+            clearOpt()
+
         }
     }
+
+    const reSendMediaChat = (param) =>{
+        const id = param[`${userName}`].id
+        if (!loading) {
+            setReplyMsg(()=>null)
+            setMicShow(()=>true)
+            vnData.current = null
+            setVoiceNoteSrc(null)
+            setRecordState(()=>recordVoice)
+            setVoicePreviewState(()=>pauseBtn)
+            setLoading(()=>true)
+            const message = param[`${userName}`].prompt
+            get(ref(db, "Messages/"+props.chatInfo))
+            .then((output)=>{
+                const randoms = "-_--_abcdefghijklmnA1234567890ABCDEFGHIJKLMNO-__-"
+                let randomValue = ""
+                for (let index = 0; index < 12; index++) {
+                    const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+                    randomValue = randomValue + generateRandom
+                }
+                let dataParticlesCollection = []
+                let dataParticleSize = 15000
+                for (let index = 0; index < displayUrl.length; index += dataParticleSize) {
+                    const particles  = displayUrl.slice(index, index + dataParticleSize)
+                    dataParticlesCollection.push(particles)
+                }
+                if(!output.val().chatArray || output.val().chatArray == "No message" || typeof(output.val().message) == "string"){
+                    // setChatArray(prev=>[...prev, {[userName]:{
+                    //         prompt: message,
+                    //         progress: sending,
+                    //         media: displayUrl,
+                    //         mediaType: mediaType,
+                    //         reply:replyMsg,
+                    //         id  
+                    // }}])
+                    const randoms = "abcdefghijklmnA1234567890BCDOELQPMLS"
+                    const generateRandom = randoms[Math.floor(Math.random()*randoms.length)]
+                    for (let index = 0; index < dataParticlesCollection.length; index++) {
+                        set(ref(db, `Media/${randomValue}/${[index]}`),{
+                            data : dataParticlesCollection[index]
+                        })
+                    }
+                    set(ref(db,"Messages/"+props.chatInfo),{
+                        chatArray: [{[userName]:{
+                            prompt:message,
+                            mediaLink: randomValue,
+                            mediaType: mediaType,
+                            reply:param[`${userName}`].reply,
+                            id
+                        }}]
+                    })
+                    .then(()=>{
+                        setCollectInputTemp(()=>null)
+                        setMediaOption(()=>false)
+                        setDisplayMedia(()=>false)
+                        setLoading(()=>false)   
+                        setMicShow(()=>true)
+                        sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
+                        const friendsList = props.mutualRender
+                        const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                        const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                        
+                        if (getFriend && getFriend.length > 0) {
+                            props.setMutualRender([...getOtherFriend, getFriend[0]])
+                        }
+                        set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                            user: randomValue
+                        })
+                         setChatArray(prev=>{
+                            return prev.map((chat)=>{
+                                const user = Object.keys(chat)[0]
+                                console.log(user);
+                                if (chat[user]?.id == id) {
+                                    return{
+                                        [user]:{
+                                        ...chat[user],
+                                        progress: sent,
+                                    }}
+                                }
+                            })
+                        })
+                    })
+                    .finally(()=>{
+                        get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
+                        .then((output)=>{
+                            let typingUsers = []
+                            if (output.exists()) {
+                                typingUsers = output.val()
+                                const checkType = typingUsers.filter(typer=> typer != userName)
+                                update(ref(db, `Users/${props.chatFriendDetail.UserName}/type`),{
+                                    type: checkType
+                                })
+                            } 
+                        })
+                        .finally(()=>{
+                            get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                            .then((result)=>{
+                                let friendNotifications = []
+                                const valueToPush = {
+                                    prompt: `${userName} sent you a media`,
+                                    sender: userName
+                                }
+                                if (result.exists()) {
+                                    friendNotifications = result.val()
+                                    friendNotifications.push(valueToPush)
+                                    update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                        notifications : friendNotifications
+                                    })
+                                }
+                                else{
+                                    friendNotifications = []
+                                    friendNotifications.push(valueToPush)
+                                    update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                        notifications : friendNotifications
+                                    })
+                                }
+                            })
+                            props.otherDevices?.map((device)=>{
+                                let messages = []
+                                get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                .then((msg)=>{
+                                    if (msg.exists()) {
+                                        messages = msg.val()
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:param[`${userName}`].reply,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                    else{
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:param[`${userName}`].reply,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                })
+                            })
+                        })
+                    })
+                }
+                else{
+                    let tempData = output.val().chatArray
+                    const blob = new Blob([displayUrl], { type: mediaType });
+                    const url = URL.createObjectURL(blob);
+                    // setChatArray(prev=> [...prev, {[userName]:{
+                    //     prompt:message,
+                    //     media: displayUrl,
+                    //     progress: sending,
+                    //     mediaType: mediaType,
+                    //     reply:replyMsg,
+                    //     id
+                    // }}])
+                    for (let index = 0; index < dataParticlesCollection.length; index++) {
+                        set(ref(db, `Media/${randomValue}/${[index]}`),{
+                            data : dataParticlesCollection[index]
+                        })
+                    }
+                    tempData.push({[userName]:{
+                        prompt:message,
+                        progress: sending,
+                        mediaLink: randomValue,
+                        mediaType: mediaType,
+                        reply:param[`${userName}`].reply,
+                        id
+                    }})
+                    set(ref(db,"Messages/"+props.chatInfo),{
+                        chatArray: tempData
+                    })
+                    .then(()=>{
+                        setCollectInputTemp(()=>null)
+                        setMediaOption(()=>false)
+                        setDisplayMedia(()=>false)
+                        setLoading(()=>false)
+                        setMicShow(()=>true)
+                        sendToNodeServer(props.chatFriendDetail.UserName, "TIlChat", `${userName} sent you a media`)
+                        const friendsList = props.mutualRender
+                        const getFriend = friendsList.filter(friend => props.chatFriendDetail.UserName == friend.UserName)
+                        const getOtherFriend = friendsList.filter(friend => props.chatFriendDetail.UserName != friend.UserName)
+                        
+                        if (getFriend && getFriend.length > 0) {
+                            props.setMutualRender([...getOtherFriend, getFriend[0]])
+                        }
+                        set(ref(db,`Users/${props.chatFriendDetail.UserName}/onlineCheck`),{
+                            user: randomValue
+                        })
+                         setChatArray(prev=>{
+                            return prev.map((chat)=>{
+                                const user = Object.keys(chat)[0]
+                                console.log(user);
+                                if (chat[user]?.id == id) {
+                                    return{
+                                        [user]:{
+                                        ...chat[user],
+                                        progress: sent,
+                                    }}
+                                }
+                            })
+                        })
+                    })
+                    .finally(()=>{
+                        get(ref(db, `Users/${props.chatFriendDetail.UserName}/type/type`))
+                        .then((output)=>{
+                            let typingUsers = []
+                            if (output.exists()) {
+                                typingUsers = output.val()
+                                const checkType = typingUsers.filter(typer=> typer != userName)
+                                update(ref(db, `Users/${props.chatFriendDetail.UserName}/type`),{
+                                    type: checkType
+                                })
+                            } 
+                        })
+                        .finally(()=>{
+                            get(ref(db, `Users/${props.chatFriendDetail.UserName}/notifications`))
+                            .then((result)=>{
+                                let friendNotifications = []
+                                const valueToPush = {
+                                    prompt: `${userName} sent you a media`,
+                                    sender: userName
+                                }
+                                if (result.exists()) {
+                                    friendNotifications = result.val()
+                                    friendNotifications.push(valueToPush)
+                                    update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                        notifications : friendNotifications
+                                    })
+                                }
+                                else{
+                                    friendNotifications = []
+                                    friendNotifications.push(valueToPush)
+                                    update(ref(db, `Users/${props.chatFriendDetail.UserName}`),{
+                                        notifications : friendNotifications
+                                    })
+                                }
+                            })
+                            props.otherDevices?.map((device)=>{
+                                let messages = []
+                                get(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}/chat`))
+                                .then((msg)=>{
+                                    if (msg.exists()) {
+                                        messages = msg.val()
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:param[`${userName}`].reply,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                    else{
+                                        messages.push({
+                                            [userName]: {
+                                                prompt: message,
+                                                media: displayUrl,
+                                                mediaType: mediaType,
+                                                reply:param[`${userName}`].reply,
+                                                id  
+                                            }
+                                        })
+                                        update(ref(db, `DevicesMessages/${userName}/"${device}"/${props.chatInfo}`), {chat:messages})
+                                    }
+                                })
+                            })
+                        })
+                    })
+                }
+            })
+            scrollToBottom()
+        }
+    }
+
     const changeMediaOption = () =>{
         if (mediaOption) {
             setMediaOption(()=>false)
@@ -1259,31 +2077,32 @@ const ChatDisplay = (props) => {
             let arrayToAdjust = chatArray
             for (let index = 0; index < arrayToMap.length; index++) {
                 const output = arrayToMap[index]
-                const user = Object.keys(output)[0]
-                const userData = output[user]
-                if(user != userName && userData?.mediaLink && !userData?.media){
-                    get(ref(db, `Media/${userData.mediaLink}`))
-                    .then((response)=>{
-                        if (response.exists()) {
-                            const allChunks = response.val()
-                            let collectData = []
-                            allChunks?.map((output, index) => {
-                                collectData.push(output.data)
-                            })
-                            const uint8Chunks = collectData.map(chunk => new Uint8Array(chunk));
-                            const blob = new Blob(uint8Chunks, { type: arrayToAdjust[index][user].mediaType });
-                            const url = URL.createObjectURL(blob);
-                            setChatArray(prev=>prev.map((data, i) =>
-                                i == index? {...data,[user]: {...data[user],media: blob}} : data
-                            ))
-                            
-                            allChunks.map((output, index)=>{
-                                set(ref(db, `Media/${userData.mediaLink}/${index}`), null)
-                                .then(()=>{
+                if (output) {
+                    const user = Object.keys(output)[0]
+                    const userData = output[user]
+                    if(user != userName && userData?.mediaLink && !userData?.media){
+                        get(ref(db, `Media/${userData.mediaLink}`))
+                        .then((response)=>{
+                            if (response.exists()) {
+                                const allChunks = response.val()
+                                let collectData = []
+                                allChunks?.map((output, index) => {
+                                    collectData.push(output.data)
                                 })
-                            })
-                        }
-                    })
+                                const uint8Chunks = collectData.map(chunk => new Uint8Array(chunk));
+                                const blob = new Blob(uint8Chunks, { type: arrayToAdjust[index][user].mediaType });
+                                const url = URL.createObjectURL(blob);
+                                setChatArray(prev=>prev.map((data, i) =>
+                                    i == index? {...data,[user]: {...data[user],media: blob}} : data
+                                ))
+                                allChunks.map((output, index)=>{
+                                    set(ref(db, `Media/${userData.mediaLink}/${index}`), null)
+                                    .then(()=>{
+                                    })
+                                })
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -1338,6 +2157,50 @@ const ChatDisplay = (props) => {
         }, 1000);
     }
 
+    // const [moreOption, setMoreOption] = useState(true) 
+    const displayOpt = (e, id) =>{
+        const parent = e?.target?.offsetParent
+        const option = parent.children[0]
+        document.querySelectorAll(".optionList").forEach((opt)=>{
+            opt.style.display = "none"
+        })
+        document.querySelectorAll(".moreIcon").forEach((icon)=>{
+            icon.style.display = "none"
+        })
+        document.querySelectorAll(".request").forEach((chat)=>{
+            chat.style.filter = "blur(10px)"
+            chat.style.pointerEvent = "none"
+        })
+        document.querySelectorAll(".response").forEach((chat)=>{
+            chat.style.filter = "blur(10px)"
+            chat.style.pointerEvent = "none"
+        })
+        document.getElementById(id).style.filter = "blur(0px)"
+        document.getElementById(id).style.pointerEvent = "d"
+        option.style.display = "flex"
+    }
+
+    const clearOpt = (e) =>{
+        if (e?.target?.className == "moreIcon") {
+            return
+        }
+        document.querySelectorAll(".optionList").forEach((opt)=>{
+            opt.style.display = "none"
+        })
+        document.querySelectorAll(".moreIcon").forEach((icon)=>{
+            icon.style.display = "block"
+        })
+        document.querySelectorAll(".request").forEach((chat)=>{
+            chat.style.filter = "blur(0px)"
+            chat.style.pointerEvent = "d"
+        })
+        document.querySelectorAll(".response").forEach((chat)=>{
+            chat.style.filter = "blur(0px)"
+            chat.style.pointerEvent = "d"
+        })
+    }
+
+
     return (
         <main className='main-overall' style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"calc(100% - 00px)"}}>
             {displayMedia?
@@ -1358,32 +2221,62 @@ const ChatDisplay = (props) => {
                     </div>
                 </header>
                 <div className='welcome-view-ai'>
-                    <div className='chat-log-overflow'>
-                        <div className="chat-log">
+                    <div className='chat-log-overflow' onClick={(e)=>{clearOpt(e)}}>
+                        <div className="chat-log blurItem">
                             {
                                 chatArray.map((output,index)=>{
                                     if(output){
                                         if (Object.keys(output)[0] == userName) {
                                             return(
                                                 <div className='request chat-request' key={index} id={output[`${userName}`]?.id? output[`${userName}`]?.id : ""} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} draggable>
-                                                    <main>
-                                                        {output[`${userName}`]?.reply? <ReplyComponent id={output[`${userName}`]?.reply.id} user={output[`${userName}`]?.reply?.user}/>: null}
-                                                        <MediaTypesSelect type={output[`${userName}`].mediaType} data={output[`${userName}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
-                                                        <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${userName}`].voiceNote} statusPreview={statusPreview}/>
-                                                        <p>{output[`${userName}`].prompt}<img src={output[`${userName}`].progress} alt="" className='progress'/></p>
-                                                    </main>
+                                                    <div className="optET">
+                                                        <div id={`${output[`${userName}`]?.id}opt`} className="optionList" >
+                                                            <div className="option settings"><p>Settings</p></div>
+                                                            <div className="option" ><p>Chat Blog</p></div>
+                                                            <div className="option"><p>About</p></div>
+                                                            <div className="option"><p>Donate</p></div>
+                                                            <div className="option"><p>Log out</p></div>
+                                                        </div>
+                                                        <img src={more} onClick={(e)=>{displayOpt(e, output[`${userName}`]?.id)}} alt="" className='moreIcon' />
+                                                        <main>
+                                                            {output[`${userName}`]?.reply? <ReplyComponent id={output[`${userName}`]?.reply.id} user={output[`${userName}`]?.reply?.user}/>: null}
+                                                            <MediaTypesSelect type={output[`${userName}`].mediaType} data={output[`${userName}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                                            <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${userName}`].voiceNote} statusPreview={statusPreview}/>
+                                                            <p>{output[`${userName}`].prompt}<img src={output[`${userName}`].progress} alt="" className='progress' onClick={output[`${userName}`].progress == sending? ()=>{resendChat(output)} : null}/></p>
+                                                            <div className="chat-tail tail-right"></div>
+                                                        </main>
+                                                    </div>
+                                                    <section>
+                                                        <img src={props.userCredentials.profilePic} alt="" className="userProf" />
+                                                        <p>{userName}</p>
+                                                    </section>
                                                 </div>
                                             )
                                         }
                                         else{
                                             return(
                                                 <div className='response chat-response' key={index} id={output[`${Object.keys(output)[0]}`]?.id? output[`${Object.keys(output)[0]}`]?.id : ""} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} draggable>
-                                                    <main>
-                                                        {output[`${Object.keys(output)[0]}`]?.reply? (<ReplyComponent id={output[`${Object.keys(output)[0]}`]?.reply?.id} user={output[`${Object.keys(output)[0]}`]?.reply?.user}/>) : null}
-                                                        <MediaTypesSelect type={output[`${Object.keys(output)[0]}`].mediaType} data={output[`${Object.keys(output)[0]}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
-                                                        <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${Object.keys(output)[0]}`].voiceNote} statusPreview={statusPreview}/>
-                                                        <p>{output[`${Object.keys(output)[0]}`].prompt}</p>
-                                                    </main>
+                                                    <div className="optET">
+                                                        <div id={`${output[`${Object.keys(output)[0]}`]?.id}opt`} className="optionList" >
+                                                            <div className="option settings"><p>Settings</p></div>
+                                                            <div className="option" ><p>Chat Blog</p></div>
+                                                            <div className="option"><p>About</p></div>
+                                                            <div className="option"><p>Donate</p></div>
+                                                            <div className="option"><p>Log out</p></div>
+                                                        </div>
+                                                        <img src={more} onClick={(e)=>{displayOpt(e, output[`${Object.keys(output)[0]}`]?.id)}} alt="" className='moreIcon' />
+                                                        <main>
+                                                            {output[`${Object.keys(output)[0]}`]?.reply? (<ReplyComponent id={output[`${Object.keys(output)[0]}`]?.reply?.id} user={output[`${Object.keys(output)[0]}`]?.reply?.user}/>) : null}
+                                                            <MediaTypesSelect type={output[`${Object.keys(output)[0]}`].mediaType} data={output[`${Object.keys(output)[0]}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
+                                                            <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${Object.keys(output)[0]}`].voiceNote} statusPreview={statusPreview}/>
+                                                            <p>{output[`${Object.keys(output)[0]}`].prompt}</p>
+                                                            <div className="chat-tail tail-left"></div>
+                                                        </main>
+                                                   </div>
+                                                    <section>
+                                                        <img src={props.chatFriendDetail.profilePic} alt="" className="userProf" />
+                                                        <p>{Object.keys(output)[0]}</p>
+                                                    </section>
                                                 </div>
                                             )
                                         }
@@ -1482,7 +2375,7 @@ const ChatDisplay = (props) => {
                     <div className="voiceNote">
                         <img src={deleteImg} onClick={closeVn}/>
                         <img src={voicePreviewState} onClick={pausePlayVoice}/>
-                        <img src={send} onClick={sendVN} style={{filter:"opacity(.6) invert(1)"}}/>
+                        <img src={send} onClick={sendVN} style={{filter:"opacity(.6) invert(1)", width:"25px"}}/>
                     </div>
                 : 
                     <div className="welcome-input">

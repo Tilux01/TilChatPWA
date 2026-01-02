@@ -76,6 +76,8 @@
     overflow-y: auto;
     overflow-anchor: auto;
     scroll-behavior: smooth;
+    position: relative;
+    /* border: 2px solid red; */
 }
 .view-overall .welcome-view-ai .chat-log-overflow::-webkit-scrollbar{
     width: 3px;
@@ -93,7 +95,9 @@
     /* overflow-y: scroll; */
     justify-content: flex-end;
     gap: 1rem;
+    position: relative;
 }
+
 .view-overall .welcome-view-ai .chat-log .request{
     width: 100%;
     display: flex;
@@ -102,7 +106,39 @@
     align-items: flex-end;
     padding: 0px 15px;
     justify-content: center;
+    position: relative;
+    padding-bottom: 25px;
 }
+.view-overall .welcome-view-ai .chat-log .response{
+    position: relative;
+    padding-bottom: 25px;
+
+}
+.chat-tail {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+}
+
+.tail-right {
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  background: #2176ff; 
+  transform: rotate(50deg);
+  right: -5px;
+  bottom: -5.5px;
+}
+
+.tail-left {
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  background:#373839; 
+  left: 0;
+  right: auto;
+  left: -5px;
+  bottom: -5.5px;
+  transform: rotate(-50deg);
+
+}
+
 .view-overall .welcome-view-ai .chat-log main{
     max-width: 400px;
     padding: 10px;
@@ -110,8 +146,30 @@
     position: relative;
     background: #2176ff;
 }
-.view-overall .welcome-view-ai .chat-log .response main{
+.view-overall .welcome-view-ai .chat-log .request main{
+    margin-right: 40px;
+    padding-top: 10px;
+}
+.view-overall .welcome-view-ai .chat-log .request > div,
+.view-overall .welcome-view-ai .chat-log .response > div{
+    display: flex;
+    justify-content: start;
+    align-items: flex-start;
+    position: relative;
+    padding-left: 20px;
+}
+.view-overall .welcome-view-ai .chat-log .response > div{
+    flex-direction: row-reverse;
+    padding-right: 20px ;
+    padding-left: 0px;
+
+}
+.view-overall .welcome-view-ai .chat-log .response main {
     background: rgba(128, 128, 128, 0.342);
+    margin-left: 40px;
+    padding-top: 10px;
+    word-break: keep-all;
+
 }
 .view-overall .welcome-view-ai .chat-log main img,
 .view-overall .welcome-view-ai .chat-log main .videoPreviewer{
@@ -170,6 +228,8 @@
     background: #2176ff;
     padding-bottom: 4px;
     /* box-shadow: 0px 0px 10px #2176ff5e; */
+    position: relative;
+    word-break: break-all;
 }
 .view-overall .welcome-view-ai .chat-log .chat-request main img{
     border-radius: 5px;
@@ -211,6 +271,39 @@
 }
 .view-overall .welcome-view-ai .chat-log .response .typeDotParent .typingDots:nth-child(3){
     animation-delay: 0.4s
+}
+.view-overall .welcome-view-ai .chat-log section{
+    display: flex;
+    flex-direction: row-reverse;
+    position: absolute;
+    bottom: -20px;
+    /* height: 30px; */
+    justify-content: center;
+    gap: 10px;
+}
+.view-overall .welcome-view-ai .chat-log .response section{
+    flex-direction: row;
+}
+.view-overall .welcome-view-ai .chat-log section .userProf{
+    width: 30px;
+    height: 30px;
+    border-radius: 50% !important;
+    background: transparent;
+    filter: invert(0);
+    border: 0;
+    position: relative;
+    top: -20px;
+}
+.view-overall .welcome-view-ai .chat-log section p{
+    margin: 0 !important;
+    font-size: 13px !important;
+    position: relative;
+    top: -3px;
+    background: 0;
+    border: 0;
+    box-shadow: 0px 0px 0px black !important;
+    color: rgba(245, 245, 245, 0.86) !important;
+
 }
 @keyframes load {
     33%{
@@ -391,8 +484,10 @@ iframe{
     cursor: pointer;
 }
 .replyMsg audio{
-    width: 100%;
+    width: calc(100% - 60px);
     height: 40px;
+    float: left;
+    position: absolute;
 }
 
 .replyMsg .mediaPrev{
@@ -504,6 +599,37 @@ audio{
     right: 20px;
 }
 
+.chat-log .optionList{
+    position: relative;
+    top: 0;
+    width: 150px;
+    padding: 5px;
+    right: 0;
+    /* left: -130px; */
+    display: none;
+    z-index: 2;
+}
+.chat-log .moreIcon,
+.chat-log .response .moreIcon{
+    width: 25px !important;
+    height: 25px;
+    bottom:0px;
+    left: -5px;
+    position: absolute;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 20;
+}
+.chat-log .response .moreIcon{
+    left: auto;
+    right: -5px;
+}
+
+.chat-log .moreIcon:hover{
+    background: gray;
+    border-radius: 50%;
+}
+
 @keyframes increase {
     0%{
         width: 0%;
@@ -544,7 +670,10 @@ audio{
 }
 @media screen and (max-width: 550px) {
     .view-overall .welcome-view-ai .chat-log main{
-        max-width: 80%;
+        max-width:  100%;
+    }
+    .optET{
+        max-width: 90%;
     }
     audio{
         width: 70vw;

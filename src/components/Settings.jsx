@@ -202,6 +202,18 @@ const Settings = (props) => {
         }
     }
 
+    function sanitizeUserAgent(userAgent) {
+    return userAgent
+        .replace(/\./g, '_dot_') 
+        .replace(/\#/g, '_hash_') 
+        .replace(/\$/g, '_dollar_')  
+        .replace(/\[/g, '_obracket_') 
+        .replace(/\]/g, '_cbracket_') 
+        .replace(/\//g, '_slash_') 
+        .replace(/\\/g, '_backslash_')
+        .replace(/\./g, '_period_');   
+    }
+
     const logOut = () =>{
         saveChat("friendsList", null)
         localStorage.removeItem("TilChat")
@@ -218,6 +230,11 @@ const Settings = (props) => {
                     [props.userCredentials.UserName] : filterDevice
                 })
             }
+        })
+        .finally(()=>{
+            const userAgent = navigator.userAgent  
+            const sanitizeUser = sanitizeUserAgent(userAgent)
+            set(ref,(db, `DevicesMessages/${props.userCredentials.UserName}/"${sanitizeUser}`))
         })
         navigate("/signup")
     }
