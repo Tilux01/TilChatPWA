@@ -2202,6 +2202,7 @@ const ChatDisplay = (props) => {
     const holdTimer = useRef()
 
     const startHold = (e, id) =>{
+        e.preventDefault()
         holdTimer.current = setTimeout(() => {
             displayOpt(e, id)
         }, 500);
