@@ -2200,6 +2200,18 @@ const ChatDisplay = (props) => {
         })
     }
 
+    const holdTimer = useRef()
+
+    const startHold = (e, id) =>{
+        holdTimer.current = setTimeout(() => {
+            displayOpt(e, id)
+        }, 500);
+    }
+
+    const cancelHold = () =>{
+        clearTimeout(holdTimer.current)
+    }
+
 
     return (
         <main className='main-overall' style={props.chatState == "sider"? {display: "none"} : {display: "flex", width:"calc(100% - 00px)"}}>
@@ -2238,7 +2250,7 @@ const ChatDisplay = (props) => {
                                                             <div className="option"><p>Log out</p></div>
                                                         </div>
                                                         <img src={more} onClick={(e)=>{displayOpt(e, output[`${userName}`]?.id)}} alt="" className='moreIcon' />
-                                                        <main>
+                                                        <main onMouse={(e)=>{startHold(e, output[`${userName}`]?.id)}} onTouchStart={(e)=>{startHold(e, output[`${userName}`]?.id)}} onMouseUp={cancelHold} onMouseLeave={cancelHold} onTouchEnd={cancelHold} onTouchCancel={cancelHold}>
                                                             {output[`${userName}`]?.reply? <ReplyComponent id={output[`${userName}`]?.reply.id} user={output[`${userName}`]?.reply?.user}/>: null}
                                                             <MediaTypesSelect type={output[`${userName}`].mediaType} data={output[`${userName}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
                                                             <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${userName}`].voiceNote} statusPreview={statusPreview}/>
@@ -2265,7 +2277,7 @@ const ChatDisplay = (props) => {
                                                             <div className="option"><p>Log out</p></div>
                                                         </div>
                                                         <img src={more} onClick={(e)=>{displayOpt(e, output[`${Object.keys(output)[0]}`]?.id)}} alt="" className='moreIcon' />
-                                                        <main>
+                                                        <main onMouse={(e)=>{startHold(e, output[`${Object.keys(output)[0]}`]?.id)}} onTouchStart={(e)=>{startHold(e, output[`${Object.keys(output)[0]}`]?.id)}} onMouseUp={cancelHold} onMouseLeave={cancelHold} onTouchEnd={cancelHold} onTouchCancel={cancelHold}>
                                                             {output[`${Object.keys(output)[0]}`]?.reply? (<ReplyComponent id={output[`${Object.keys(output)[0]}`]?.reply?.id} user={output[`${Object.keys(output)[0]}`]?.reply?.user}/>) : null}
                                                             <MediaTypesSelect type={output[`${Object.keys(output)[0]}`].mediaType} data={output[`${Object.keys(output)[0]}`].media} setPreviewMedia={setPreviewMedia} previewSrc={previewSrc} previewType = {previewType} statusPreview={statusPreview}/>
                                                             <MediaTypesSelect type={'audio/webm;codecs=opus'} data={output[`${Object.keys(output)[0]}`].voiceNote} statusPreview={statusPreview}/>
