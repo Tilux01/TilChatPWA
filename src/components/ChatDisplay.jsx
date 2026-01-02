@@ -261,7 +261,7 @@ const ChatDisplay = (props) => {
                 if (checkFriendTyping.length > 0) {
                     setFriendTyping(()=>true)
                     setTimeout(() => {
-                        scrollToBottom()
+                        // scrollToBottom()
                     }, 1000);
                 }
                 else{
@@ -355,7 +355,6 @@ const ChatDisplay = (props) => {
     useEffect(() => {
         saveChat(props.chatInfo, chatArray)
         holdChat.current = chatArray
-        holdChat.current
         console.log(chatArray);
         
         if (chatArray && chatArray.length > 0) {
