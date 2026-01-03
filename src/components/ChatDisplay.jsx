@@ -2177,6 +2177,20 @@ const ChatDisplay = (props) => {
         document.getElementById(id).style.filter = "blur(0px)"
         document.getElementById(id).style.pointerEvent = "d"
         option.style.display = "flex"
+        if (window.innerWidth <= 550) {
+            document.querySelectorAll(".optET").forEach((opt)=>{
+                opt.style.flexDirection = "column-reverse"
+            })
+            document.querySelectorAll(`.response .optionList`).forEach((opt)=>{
+                opt.style.marginLeft = "42px"
+            })
+            document.querySelectorAll(`.request .optionList`).forEach((opt)=>{
+                opt.style.marginRight = "42px"
+            })
+            document.querySelectorAll(".view-overall .welcome-view-ai .chat-log .response .optET").forEach((optET)=>{
+                optET.style.alignItems = "flex-start"
+            })
+        }
     }
 
     const clearOpt = (e) =>{
@@ -2205,7 +2219,7 @@ const ChatDisplay = (props) => {
         e.preventDefault()
         holdTimer.current = setTimeout(() => {
             displayOpt(e, id)
-        }, 500);
+        }, 300);
     }
 
     const cancelHold = () =>{
@@ -2243,11 +2257,13 @@ const ChatDisplay = (props) => {
                                                 <div className='request chat-request' key={index} id={output[`${userName}`]?.id? output[`${userName}`]?.id : ""} onDoubleClick={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} onDrag={()=>{reply(output[`${Object.keys(output)[0]}`].id, `${Object.keys(output)[0]}`)}} draggable>
                                                     <div className="optET">
                                                         <div id={`${output[`${userName}`]?.id}opt`} className="optionList" >
-                                                            <div className="option settings"><p>Settings</p></div>
-                                                            <div className="option" ><p>Chat Blog</p></div>
-                                                            <div className="option"><p>About</p></div>
-                                                            <div className="option"><p>Donate</p></div>
-                                                            <div className="option"><p>Log out</p></div>
+                                                            <div className="option settings"><p>Reply ↩️</p></div>
+                                                            <div className="option" ><p>Forward ⏩️</p></div>
+                                                            <div className="option"><p>Copy</p></div>
+                                                            <div className="option"><p>Star ⭐</p></div>
+                                                            <div className="option"><p>Delete 🗑️</p></div>
+                                                            <div className="option"><p>Info ℹ️</p></div>
+                                                            <div className="option"><p>Select Multiple ☑️</p></div>
                                                         </div>
                                                         <img src={more} onClick={(e)=>{displayOpt(e, output[`${userName}`]?.id)}} alt="" className='moreIcon' />
                                                         <main onMouse={(e)=>{startHold(e, output[`${userName}`]?.id)}} onTouchStart={(e)=>{startHold(e, output[`${userName}`]?.id)}} onMouseUp={cancelHold} onMouseLeave={cancelHold} onTouchEnd={cancelHold} onTouchCancel={cancelHold}>

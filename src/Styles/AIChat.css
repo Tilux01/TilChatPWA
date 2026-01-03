@@ -104,7 +104,7 @@
     flex-direction: column;
     overflow: hidden;
     align-items: flex-end;
-    padding: 0px 15px;
+    padding-right: 5px;
     justify-content: center;
     position: relative;
     padding-bottom: 25px;
@@ -154,21 +154,22 @@
 .view-overall .welcome-view-ai .chat-log .response > div{
     display: flex;
     justify-content: start;
-    align-items: flex-start;
     position: relative;
     padding-left: 20px;
+    align-items: flex-end;
 }
 .view-overall .welcome-view-ai .chat-log .response > div{
     flex-direction: row-reverse;
     padding-right: 20px ;
     padding-left: 0px;
+}
 
+.view-overall .welcome-view-ai .chat-log .request > div{
 }
 .view-overall .welcome-view-ai .chat-log .response main {
     background: rgba(128, 128, 128, 0.342);
     margin-left: 40px;
     padding-top: 10px;
-    word-break: keep-all;
 
 }
 .view-overall .welcome-view-ai .chat-log main img,
@@ -210,7 +211,7 @@
     color: whitesmoke;
     animation: show 0.5s 1;
     display: flex;
-    margin-right: 15px;
+    padding-right: 10px;
 }
 .view-overall .welcome-view-ai .chat-log .request .progress{
     width: 13px;
@@ -229,7 +230,7 @@
     padding-bottom: 4px;
     /* box-shadow: 0px 0px 10px #2176ff5e; */
     position: relative;
-    word-break: break-all;
+    word-wrap: break-all;
 }
 .view-overall .welcome-view-ai .chat-log .chat-request main img{
     border-radius: 5px;
@@ -239,7 +240,7 @@
     display: flex;
     overflow: hidden;
     justify-content: flex-start;
-    padding-left: 15px;
+    padding-left: 5px;
 }
 .view-overall .welcome-view-ai .chat-log .response p{
     max-width: 400px;
@@ -249,6 +250,7 @@
     font-size: 16px;
     color: whitesmoke;
     animation: show 0.2s 1;
+    /* word-wrap: break-word; */
 }
 .view-overall .welcome-view-ai .chat-log .response .typeDotParent{
     display: flex;
@@ -602,12 +604,16 @@ audio{
 .chat-log .optionList{
     position: relative;
     top: 0;
-    width: 150px;
+    width: 160px;
     padding: 5px;
     right: 0;
     /* left: -130px; */
     display: none;
     z-index: 2;
+}
+
+.chat-log .optionList p{
+    padding: 0 !important;
 }
 .chat-log .moreIcon,
 .chat-log .response .moreIcon{
@@ -673,7 +679,7 @@ audio{
         max-width:  100%;
     }
     .optET{
-        max-width: 90%;
+        max-width: 78%;
     }
     audio{
         width: 70vw;
