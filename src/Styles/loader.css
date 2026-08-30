@@ -1,0 +1,29 @@
+.loader{
+    display: flex;
+    background: #2176ff;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;   
+    width: 100%;
+    gap: 5px;
+    width: 55px;
+    height: 100%;
+}
+.loader div{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(245, 245, 245, 0.671);
+    animation: load 0.6s linear infinite;
+}
+.loader div:nth-child(2){
+    animation-delay: 0.2s;
+}
+.loader div:nth-child(3){
+    animation-delay: 0.4s;
+}
+@keyframes load {
+    33%{
+        scale: 1;
+    }
+}

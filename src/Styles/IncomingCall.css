@@ -1,0 +1,63 @@
+.incomingOverall{
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 80px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    width: 98%;
+    max-width: 500px;
+    background: rgba(128, 128, 128, 0.157);
+    backdrop-filter: blur(5px);
+    z-index: 90000000;
+    transition: height 2s;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px;
+    align-items: center;
+}
+.incomingOverall .profile{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+}
+.incomingOverall .profileDetail{
+    flex: 1;
+    padding-left: 10px;
+    color: whitesmoke;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+.incomingOverall .profileDetail small{
+    font-size: 10px;
+}
+.incomingOverall .profileDetail p{
+    font-weight: 600;
+}
+.incomingOverall .actionBtn{
+    display: flex;
+    gap: 5px;
+}
+.incomingOverall .actionBtn .endCall,
+.incomingOverall .actionBtn .acceptCall,
+.incomingOverall .actionBtn .hideCall{
+    transform: rotate(180deg);
+    background: #2176ff;
+    width: 40px;
+    height: 40x;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.incomingOverall .actionBtn .endCall{
+    background: orangered;
+    transform: none;
+}
+.incomingOverall .actionBtn .hideCall{
+    background: rgba(128, 128, 128, 0.298);
+    filter: invert(1) brightness(.6);
+}

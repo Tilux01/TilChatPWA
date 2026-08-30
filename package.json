@@ -1,0 +1,57 @@
+{
+  "name": "tilchat",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@deepgram/sdk": "^5.0.0",
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "@google/genai": "^1.32.0",
+    "agora-access-token": "^2.0.4",
+    "agora-rtc-sdk-ng": "^4.24.2",
+    "axios": "^1.13.2",
+    "child_process": "^1.0.2",
+    "cloudinary": "^2.8.0",
+    "cra-template-pwa": "2.0.0",
+    "firebase": "^12.6.0",
+    "jsvoice": "^1.1.0",
+    "react": "^19.2.0",
+    "react-app-env": "^1.2.3",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
+    "react-scripts": "5.0.1",
+    "react-youtube": "^10.1.0",
+    "serve": "^14.2.5",
+    "socket.io-client": "^4.8.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.9.19",
+    "vite-plugin-mkcert": "^1.17.10",
+    "yaml": "^2.8.2"
+  }
+}

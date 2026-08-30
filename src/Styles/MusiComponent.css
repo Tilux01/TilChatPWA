@@ -1,0 +1,187 @@
+.music-overall{
+    width: 80%;
+    height: 100%;
+    /* height: auto;
+    min-height: 60px;*/
+    position: absolute;
+    right: 0;
+    top: 0;
+    max-width: calc(300px + 40px);
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    overflow: visible;
+}
+.music-overall .input-parent{
+    width: 100%;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    padding-left: 40px;
+    flex-direction: row-reverse;
+}
+.music-overall .input-parent input{
+    height: 30px;
+    /* margin-top: 20px; */
+    width: calc(100% - 20px);
+    padding: 17px;
+    padding-left: 10px;
+    padding-right: 20px;
+    font-weight: 600;
+    background: hsla(0, 0%, 0%, 0.314);
+    border: 0;
+    color: white;
+    /* margin-top: 20px; */
+    outline: 0;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.186)
+    ;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: rotateBg 20s linear infinite;
+}
+.music-overall .input-parent .searcIcon{
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    width: 20px ;
+    height: 20px;
+    top: 20px;
+    cursor: pointer;
+}
+.music-overall .input-parent .closeIcon{
+    width: 40px;
+    height: 40px;
+    filter: invert(1);
+}
+.music-overall .input-parent .closeIcon:hover{
+    background: rgba(128, 128, 128, 0.158);
+    border-radius: 50%;
+    cursor: pointer;
+}
+.music-overall .song-parent{
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    gap: 15px;
+    height: calc(100% - 60px);
+    overflow-y: scroll;
+    width: 100% !important;
+    position: relative;
+    top: 10px;
+    overflow-x: visible;
+    padding-left: 40px;
+    padding-right: 2px;
+}
+.music-overall .song-parent::-webkit-scrollbar{
+    width: 3px;
+}
+.music-overall .song-parent::-webkit-scrollbar-thumb{
+    background: rgba(255, 255, 255, 0.473);
+}
+.music-overall .song-parent .song{
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 15px rgba(255, 255, 255, 0.186)
+    ;
+    background: hsla(0, 0%, 100%, 0.051);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 60px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.music-overall .song-parent .song:hover{
+    transform: scale(1.1) translateX(-15px);
+    transition: all 0.3s ease;
+
+}
+.music-overall .song-parent .song img{
+    width: 40px;
+    height: 40px;
+}
+.player-parent{
+    width: 300px;
+    position: absolute;
+    z-index: 200;
+    height: 120px;
+    cursor: grab;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 15px rgba(255, 255, 255, 0.186)
+    ;
+    background: hsla(0, 0%, 100%, 0.051);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    /* right: 0; */
+    top: 11px;
+    padding: 10px;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+}
+.player-parent .songIcon{
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+}
+.player-parent .others{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+.player-parent .others p,
+.player-parent .others h6{
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+.player-parent .others .controlImg{
+    display: flex;
+    justify-content: space-evenly;
+    position: relative;
+}
+.player-parent .others .controlImg img{
+    width: 20px;
+    height: 20px;
+    filter: invert(1);
+    cursor: pointer;
+}
+.player-parent .others .controlImg .roller{
+    animation: loader 1s infinite ease;
+}
+@keyframes loader {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+.player-parent .others .controlImg .playListIcon{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+}

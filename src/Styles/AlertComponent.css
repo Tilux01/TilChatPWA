@@ -1,0 +1,45 @@
+.alertComponent{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.alertComponent p{
+    animation: none !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center;
+}
+.alertComponent .alertParent{
+    width: 95%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 0px 20px 10px #2176ff13;
+    gap: 20px;
+    border: 2px solid #2176ff;
+    padding: 20px;
+    border-radius: 20px;
+}
+.alertComponent .alertParent .div{
+    display: flex;
+    gap: 15px;
+}
+.alertComponent .alertParent button{
+    border-radius: 10px;
+    padding: 10px 0px;
+    background: #2176ff;
+    border: 0;
+    font-weight: 600;
+    color: whitesmoke;
+    width: 50%;
+    justify-self: center;
+    align-self: center;
+    cursor: pointer !important;
+}

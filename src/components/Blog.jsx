@@ -1,0 +1,82 @@
+import React, { useEffect, useRef, useState } from 'react'
+import linkBtn from "../images/link.png"
+import send from "../images/paper-plane.png"
+import "../Styles/BlogSend.css"
+import profileArrow from "../images/left-arrow-white.png"
+import PreviewMedia from './PreviewMedia'
+import logo from "../images/clinic-02.svg"
+import {app, db} from '../firebase/config'
+import {getDatabase,ref,push,set,get, query, onValue, orderByChild, equalTo, orderByKey, update} from "firebase/database"
+import {reduceImageQualityToBase64} from "../ImageConverter"
+
+
+
+const Blog = () => {
+    const userPrompt = useRef("")
+    const [previewMedia, setPreviewMedia] = useState(false)
+    const [blogArray, setBlogArray] = useState([])
+    const [gallery, setGallery] = useState(null)
+    const setGo = useRef(false)
+    const sendBlog = () =>{
+        setBlogArray(B=>[...B, {prompt: userPrompt.current.value, media:gallery}])
+    }
+    
+    useEffect(() => {
+        if (blogArray.length > 0) {
+            set(ref(db, `Blog`),{
+                blogArray
+            })
+        }
+    }, [blogArray])
+
+    useEffect(() => {
+        get(ref(db, `Blog/blogArray`))
+        .then((output)=>{
+            if (output.exists()) {
+                setBlogArray(()=>output.val())
+            }
+        })
+        .finally(()=>{
+            setGo.current = true
+        })
+    }, [])
+
+
+
+    const displayGallery = async(e) =>{
+        const file = e.target.files[0]
+        const reducedQualityBase64 = await reduceImageQualityToBase64(file, 0.7, 1024, 1024);
+        console.log(reducedQualityBase64);
+        setGallery(reducedQualityBase64.base64)
+     } 
+  return (
+    <main className='blogSend'>
+        {/* {previewMedia? <PreviewMedia previewSrc={previewSrc.current} previewType = {previewType.current} setPreviewMedia={setPreviewMedia}/> : null} */}
+        <header>
+            <div className="profile">
+                <img src={logo} alt="" style={{filter: "invert(0) opacity(.8)",border: "2px solidrgb(0, 4, 222)"}}/>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <p>TilChat Blog</p>
+                </div>
+            </div>
+        </header>
+        <div className="blogContent" style={{height:"calc(100vh - 70px)", position:"fixed", bottom:"10px"}}>
+            <main>
+            {
+                blogArray.map((output)=>{
+                    return(
+                        <div>
+                            <img src={output?.media} alt="" />
+                            <p>{output?.prompt}</p>
+                        </div>
+                    )
+                })
+            }
+            </main>
+        </div>
+        <input type="file" id='galleryUpload' onChange={(e)=>{displayGallery(e)}} name='galleryUpload' style={{display:"none"}}/>
+    </main>
+  )
+}
+
+export default Blog

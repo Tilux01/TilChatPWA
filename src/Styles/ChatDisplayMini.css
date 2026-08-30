@@ -1,0 +1,127 @@
+
+.overSea-m{
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    z-index: 2;
+    backdrop-filter: brightness(.9) blur(5px);
+    transition: all 1s ease;
+
+}
+.chat-mini{
+    width:90% !important;
+    height: 40vh !important;
+    position: absolute;
+    transform: translateY(calc(-50% - 70px)) translateX(-50%);
+    backdrop-filter: blur(20px);
+    z-index: 3;
+    top: 50%;
+    background: #111213f5;
+    left: 50%;
+    border-radius: 20px;
+    transition: all 1s ease;
+}
+.chat-mini .view-overall{
+    height: 40vh !important;
+}
+.chat-mini header{
+    height: 35px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: 20px 20px 0px 0px !important;
+}
+.chat-mini header p{
+    font-size: 16px !important;
+    color: rgba(245, 245, 245, 0.802) !important;
+}
+.chat-mini header small,
+.chat-mini header i{
+    font-size: 10px !important;
+    margin-bottom: 3px;
+    margin-left: 10px;
+}
+.chat-mini header .profile > div{
+    flex-direction: row !important;
+    display: flex !important;
+    justify-content: end !important;
+    align-items: end !important;
+}
+.chat-mini .wallpapper{
+    filter: opacity(.2);
+}
+.chat-mini .welcome-view-ai{
+    height: calc(100% - 35px) !important;
+    position: relative;
+    top: 35px;
+}
+.chat-mini .chat-log-overflow{
+    height: 100% !important;
+    min-height: auto;
+    margin: 0 !important;
+}
+.chat-mini .welcome-view-ai .chat-log{
+    gap: 0px !important;
+}
+.chat-mini .welcome-view-ai .chat-log .request,
+.chat-mini .welcome-view-ai .chat-log .response{
+    padding-bottom: 20px !important;
+}
+.chat-mini .welcome-view-ai .chat-log .request main{
+    margin-right: 0px !important;
+}
+.chat-mini .welcome-view-ai .chat-log .request > div{
+    margin-right: 5px !important;
+}
+.chat-mini .welcome-view-ai .chat-log .request > div{
+    padding-left: 0px !important;
+}
+.chat-mini .welcome-view-ai .chat-log .response main{
+    margin-left: 5px !important;
+}
+.chat-mini .main-parent{
+    width: 100%;
+}
+.chat-mini audio{
+    height: 35px !important;
+    width: 180px;
+}
+.chat-mini .settings{
+    position: absolute !important;
+    bottom: -155px;
+    height: 150px;
+    width: 50%;
+    z-index: 20;
+    backdrop-filter: blur(20px) !important;
+    z-index: 20;
+}
+.chat-mini .settings .profileOptionList{
+    background:  #111213f5;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 0px 10px black;
+    z-index: 2;
+    width: 100%;
+    flex-direction: column;
+}
+.chat-mini .settings .profileOptionList .option{
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px !important;
+    color: whitesmoke;
+    
+}
+.chat-mini .settings .profileOptionList .option:hover,
+.chat-mini .settings .profileOptionList .option:focus,
+.chat-mini .settings .profileOptionList .option:active{
+    background: rgba(128, 128, 128, 0.097);
+}
+
+.chat-log .optionList p,
+.chat-mini .settings .profileOptionList p{
+    padding: 0 !important;
+    border: 0 !important;
+    font-size: 14px !important;
+    box-shadow: 0px 0px !important;
+}

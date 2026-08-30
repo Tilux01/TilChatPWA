@@ -1,0 +1,165 @@
+.chats-Parent-overall{
+    width: 100%;
+    /* border-bottom: 2px solid aliceblue; */
+}
+.chats-overall{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-left: 15px;
+}
+.chats-overall .navArrow{
+    width: 35px;
+    height: 35px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    padding: 5px 5px 5px 2px;
+    border: 1px solid whitesmoke;
+    position: relative;
+    top: 35px;
+    filter: opacity(.6);
+    cursor: pointer;
+    z-index: 4;
+}
+.chats-overall .moreOption{
+    cursor: pointer;
+    z-index: 4;
+    position: absolute;
+}
+.chats-overall .navArrow:hover,
+.chats-overall .navArrow:active,
+.chats-overall .navArrow:focus{
+    background: rgba(128, 128, 128, 0.203);
+}
+.chats-overall h1{
+    font-size: 35px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0px 0px 10px #2176ff34;
+    margin-left: 10px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 4;
+}
+.chats-overall input[type="text"]{
+    margin-left: 10px;
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    width: 80%;
+    padding: 10px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.038)
+    ;
+    background: hsla(0, 0%, 100%, 0.051);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+}
+.chats-overall .archived-parent{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    box-shadow: 0px 0px 2px rgba(255, 255, 255, 0.041);
+    cursor: pointer;
+    align-items: center;
+    padding: 3px 0px;
+    padding-right: 5px;
+}
+.chats-overall .archived-parent:hover,
+.chats-overall .archived-parent:focus,
+.chats-overall .archived-parent:active{
+    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.041);
+}
+.chats-overall .archived-parent div{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 2px;
+}
+.chats-overall .archived-parent div img{
+    width: 22px;
+    filter: opacity(.7) invert(1);
+}
+.chats-overall .archived-parent div p{
+    color: whitesmoke;
+    font-weight: 600;
+}
+.chats-overall .archived-parent h6{
+    font-size: 18px;
+    font-weight: 800;
+    color: #2176ff;
+    margin-right: 5px;
+}
+.chats-overall .chats-parent{
+    margin-top: 20px;
+    padding-right: 10px;
+    height: calc(100dvh - 200px);
+    overflow-y: scroll;
+    transition: all 3s;
+}
+@media screen and (max-width: 900px) {
+    .chats-overall .chats-parent{
+        height: calc(100dvh - 250px) !important;
+
+    }
+}
+.chats-overall .chats-parent::-webkit-scrollbar{
+    width: 2px;
+}
+.chats-overall .chats-parent::-webkit-scrollbar-thumb{
+    background: rgba(128, 128, 128, 0.164);
+}
+.chats-overall .chats-parent .chat{
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    transition: all 3s;
+}.chats-overall .chats-parent .chat .selectedChat{
+    width: 5px;
+    height: 90%;
+    margin-right: 3px;
+    background: #2176ffc4;
+    left: 0px;
+}
+.chats-overall .chats-parent .chat img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+    margin-right: 10px;
+}
+.chats-overall .chats-parent .chat div{
+    border-top: 1px solid rgba(255, 255, 255, 0.062);
+    width: 90%;
+    padding: 2px;
+    height: 100%;
+}
+.chats-overall .chats-parent .chat div p{
+    font-weight: 600;
+    color: whitesmoke;
+    margin-top: 5px;
+}
+.chats-overall .chats-parent .chat div small{
+    color: whitesmoke;
+    opacity: .5;
+    font-weight: 600;
+    font-size: 12px;
+}
+/* @media screen and {
+    
+} */
+
+/* 
+@media screen and (max-width: 847px) {
+    .chats-overall{
+        padding-left: 15px;
+    }
+} */

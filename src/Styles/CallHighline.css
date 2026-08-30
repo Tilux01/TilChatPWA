@@ -1,0 +1,67 @@
+.highline-overall{
+    width: 90%;
+    max-width: 400px;
+    height: 30px;
+    backdrop-filter: blur(5px);
+    position: fixed;
+    z-index: 8000000000000000;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 5px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.038)
+    ;
+    background: hsla(0, 0%, 100%, 0.051);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+}
+.highline-overall .mic{
+    background: #de8900;
+    width: 25px;
+    height: 25px;
+    filter: invert(1);
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+}
+.highline-overall .acceptCall{
+    background: #2176ff;
+    transform: rotate(180deg);
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+}
+.highline-overall .end{
+    background: orangered;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px;
+}
+.highline-overall > div{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: whitesmoke;
+}
+@media screen and (min-width:900px) {
+    .highline-overall{
+        transform: none;
+        left: 70px;
+        width: 320px;
+    }
+}

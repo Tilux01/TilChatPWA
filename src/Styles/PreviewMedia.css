@@ -1,0 +1,87 @@
+.PreviewMedia{
+    width: 100%;
+    height: calc(100dvh  - 60px);
+    overflow: hidden;
+    margin-top: 60px;
+    position: absolute;
+    background: black;
+    z-index: 4000;
+    padding: 5px;
+}
+.PreviewMedia video,
+.PreviewMedia img{
+    width: 100%;
+    object-fit: contain;
+    height: 100%;
+    
+    position: relative;
+    padding: 0;
+}
+.PreviewMedia .close{
+    filter: invert(1);
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 5px;
+    z-index: 2;
+    left: 5px;
+    background: rgba(31, 30, 30, 0.151);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.5s;
+
+}
+.PreviewMedia .close.close:hover{
+    scale: 1.3;
+    transition: all 0.5s;
+
+}
+.PreviewMedia .moreOption{
+    filter: invert(1);
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: 5px;
+    z-index: 2;
+    right: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.5s;
+    padding: 5px;
+}   
+.PreviewMedia .option:hover{
+    background: rgba(31, 30, 30, 0.151);
+}
+.PreviewMedia .optionList{
+    position: absolute;
+    color: whitesmoke;
+    right: 10px;
+    top: 45px;
+    background: hsl(0, 0%, 6%);
+    width: 100px;
+    height: auto;
+    padding: 5px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+.PreviewMedia .optionList .option{
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+}
+.PreviewMedia .optionList .option:hover,
+.PreviewMedia .optionList .option:active,
+.PreviewMedia .optionList .option:focus{
+    background:rgba(128, 128, 128, 0.11);;
+}
+.PreviewMedia .optionList .option p{
+    font-weight: 600;
+    color: whitesmoke !important;
+    font-size: 14px;
+    width: 100%;
+    height: 100%;
+}

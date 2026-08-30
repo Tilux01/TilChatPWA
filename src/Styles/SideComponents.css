@@ -1,0 +1,77 @@
+.side-components-parent{
+    width: 600px !important;
+    border-radius: 20px;
+    display: flex;
+    margin-top: 0;
+    /* overflow: hidden; */
+    height: 100dvh;
+    background: #222532;
+    /* background: radial-gradient(72.23% 72.23% at 33.11% -35.43%, #6942FF 29%, #352180 65%, #000000 100%); */
+}
+.side-components-parent > h1{
+    position: absolute;
+    bottom: 80px;
+    right: 10px;
+    z-index: 600;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0%, rgba(31, 117, 255, 0.16) 100%);
+    background-size: 600%;
+    color: white;
+    text-align: center;
+    border: 1px solid white;
+    width: 60px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.186)
+    ;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: rotateBg 20s linear infinite;
+}
+.live-side{
+    width: 420px !important;
+}
+.chats-Parent-overall{
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+.side-components-parent{
+}
+@media screen and (max-width: 1235px) {
+    .side-components-parent{
+        width: 550px;
+    }
+    .live-side{
+        width: 370px !important;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .side-components-parent{
+        /* flex-direction: column-reverse; */
+        overflow: hidden;
+        height: calc(100dvh - 70px);
+        margin-bottom: 70px;
+    }
+    .settingsIconSider{
+        display: none !important;
+    }
+    .side-components-parent > h1{
+        display: flex;
+    }
+}
+@media screen and (max-width: 800px) {
+    .side-components-parent{
+        width: 100dvw;
+    }
+    .live-side{
+        width: 100% !important;
+    }
+}

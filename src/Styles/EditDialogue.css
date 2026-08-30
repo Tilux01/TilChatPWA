@@ -1,0 +1,50 @@
+.editDialogue{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.editDialogue .editParent{
+    width: 95%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 2px solid #2176ff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 20px 10px #2176ff13;
+}
+.editDialogue .editParent textarea{
+    background: transparent;
+    color: whitesmoke;
+    padding: 5px;
+    font-weight: 600;
+    border-radius: 10px;
+    width: 100%;
+}
+.editDialogue .editParent .buttonParent{
+    display: flex;
+    gap: 20px;
+}
+.editDialogue .editParent .buttonParent button{
+    border-radius: 10px;
+    padding: 10px 0px;
+    background: #2176ff;
+    border: 0;
+    font-weight: 600;
+    color: whitesmoke;
+    width: 50%;
+    justify-self: center;
+    align-self: center;
+    cursor: pointer !important;
+}
+.editDialogue .editParent .buttonParent button:nth-child(1){
+    background: rgb(255, 38, 0);
+}

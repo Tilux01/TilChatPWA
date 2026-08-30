@@ -1,0 +1,147 @@
+.signup-overall{
+    background: linear-gradient(
+        160deg,
+        #1c1e294d 0%,     
+        #111945a1 0%,     
+        #181a22 50%,
+        #14161e 100%
+    );
+    background-size: 200%;
+    width: 600%;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: rotateBg 10s linear infinite;
+}
+@keyframes rotateBg  {
+    0%{
+        background-position: 0 0;
+    }
+    50%{
+        background-position: 100% 200%;
+    }
+    100%{
+        background-position: 0 0;
+    }
+}
+.signup-overall .bg{
+    width: 100%;
+    filter: brightness(.6) blur(5px);
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.signup-overall .sign-dialogue{
+    width: 98%;
+    max-width: 500px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.062);
+    padding: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.186)
+    ;
+    backdrop-filter: blur(10px) brightness(.9);
+    -webkit-backdrop-filter: blur(10px) brightness(.9);
+    border-radius: 20px;
+    animation: rotateBg 20s linear infinite;
+}
+.signup-overall .sign-dialogue h1{
+    color: white;
+    font-size: 40px;
+}
+.signup-overall .sign-dialogue .option{
+    display: flex;
+    flex-direction: column;
+    margin: 40px;
+    gap: 40px;
+    width: 100%;
+}
+.signup-overall .sign-dialogue .option-l{
+    gap: 0px !important;
+    margin: 0;
+    margin-top: 40px;
+}
+.signup-overall .sign-dialogue .option p{
+    font-size: 16px;
+    color: white;
+    font-weight: 600;
+}
+.signup-overall .sign-dialogue .option .mt-p{
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   width: 100%;
+}
+.signup-overall .sign-dialogue .option .mt-p .mt{
+    width: 100%;
+    height: 45px;
+    border-radius: 20px;
+    background: #D9D9D91A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    box-shadow: 
+        inset 50px 40px 100px #1c1e29c9,
+        inset -20px 0px 100px #4415ed0b 
+    ;
+}
+.signup-overall .sign-dialogue .option .mt-p .mt:hover{
+    box-shadow: 
+        inset 0px 0px 50px #2176ff16,
+        inset 0px 0px 50px #4515f01c
+        /* -50px -40px 100px #6842ff30,
+        20px 40px 100px #3621802d */
+    ;
+}
+.signup-overall .sign-dialogue .option .mt-p .mt img{
+    width: 30px;
+    height: 30px;
+}
+.signup-overall .sign-dialogue .option .mt-p .mt .github{
+    filter: invert(1);
+}
+.signup-overall .sign-dialogue .option .mt-p .mt p{
+    font-weight: 500;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.645);
+}
+.signup-overall .or-p{
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+}
+.signup-overall .or-p .l{
+    width: 40%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.204);
+}
+.signup-overall .or-p p{
+    color: white;
+    font-size: 16px;
+}
+.sign-dialogue h6{
+    margin-top: 10px;
+    color: #2195f3a4;
+    cursor: pointer;
+}
+@media screen and (max-width:500px) {
+    .signup-overall .sign-dialogue{
+        height: 98vh !important;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "buildCommand": "CI=false GENERATE_SOURCEMAP=false DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "devCommand": "npm start",
+  "outputDirectory": "build",
+  "framework": "create-react-app"
+}

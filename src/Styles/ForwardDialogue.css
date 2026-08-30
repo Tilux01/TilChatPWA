@@ -1,0 +1,184 @@
+.forwardOverAll{
+    width: 100%;
+    height: calc(100dvh - 70px);
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    padding-top: 10px;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding-bottom: 5px;
+}
+.createGroup{
+    width: 100%;
+    height: 100dvh;
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    padding-top: 50px !important;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    padding-top: 10px;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding-bottom: 5px;
+}
+@media screen and (max-width: 400px) {
+    .forwardOverAll{
+        background: hsla(0, 0%, 20%, 0.382);
+        padding-bottom: 0px;
+    }
+    .forwardOverAll .forwardParent{
+        background: none !important;
+    }
+}
+.forwardOverAll input{
+    padding: 7px;
+    border: 0;
+    outline: 0;
+    color: whitesmoke;
+    font-weight: 600;
+    background: hsla(0, 0%, 20%, 0.546);
+    border-radius: 10px;
+    width: calc(100% - 30px);
+    max-width: 400px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+.forwardOverAll .forwardParent{
+    background: rgba(128, 128, 128, 0.1);
+    height: 100%;
+    overflow: scroll;
+    width: 100%;
+    padding-left: 15px;
+    max-width: 400px;
+    transition: all 5s;
+    box-shadow: 0px 0px 20px 5px #2176ff13;
+}
+.forwardOverAll .forwardParent .chat{
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    transition: all 1s ease;
+}
+.forwardOverAll .forwardParent .chat img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+    margin-right: 10px;
+}
+.forwardOverAll .forwardParent .chat div{
+    border-top: 1px solid rgba(255, 255, 255, 0.062);
+    width: 90%;
+    padding: 2px;
+    height: 100%;
+}
+.forwardOverAll .forwardParent .chat div p{
+    font-weight: 600;
+    color: whitesmoke;
+    margin-top: 5px;
+}
+.forwardOverAll .forwardParent .chat div small{
+    color: whitesmoke;
+    opacity: .5;
+    font-weight: 600;
+    font-size: 12px;
+}
+.forwardOverAll .forwardParent::-webkit-scrollbar{
+    width: 2px;
+}
+.forwardOverAll .forwardParent::-webkit-scrollbar-thumb{
+    background: rgba(128, 128, 128, 0.164);
+}
+.forwardOverAll .parentBtn{
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    padding:0px 15px;
+    width: 100%;
+    max-width: 400px;
+}
+.forwardOverAll .parentBtn button{
+    border-radius: 10px;
+    padding: 7px 0px;
+    background: #2176ff;
+    border: 0;
+    font-weight: 600;
+    color: whitesmoke;
+    width: 70px;
+    justify-self: center;
+    align-self: center;
+    cursor: pointer !important;
+}
+.forwardOverAll .parentBtn p{
+    color: white;
+    font-weight: 600;
+}
+.forwardOverAll .parentBtn button:nth-child(1){
+    background: rgb(255, 38, 0);
+}
+.forwardOverAll .forwardParent .chat .choose,
+.forwardOverAll .forwardParent .chat .choosed{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 1px solid  rgba(128, 128, 128, 0.834);
+    border-radius: 50%;
+    cursor: pointer;
+    right: 15px;
+}
+.forwardOverAll .forwardParent .chat .choosed{
+    background: #2176ff;
+}
+.forwardOverAll .createGp{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    gap: 20px;
+
+}
+.forwardOverAll .createGp img{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #2176ff;
+    object-fit: cover;
+    margin-top: 15vh;
+    cursor: pointer;
+}
+.forwardOverAll .createGp input{
+    padding: 15px;
+}
+.forwardOverAll .createGp button{
+    width: 90%;
+    padding: 15px 0px;
+    background: #2176ff;
+    font-weight: 600;
+    outline: 0;
+    border-radius: 20px;
+    color: whitesmoke;
+    border: 0;
+    cursor: pointer;
+}
+.forwardOverAll .createGp button:hover,
+.forwardOverAll .createGp button:focus,
+.forwardOverAll .createGp button:active{
+    background: #0e62e8;
+    
+}

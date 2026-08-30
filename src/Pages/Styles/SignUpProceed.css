@@ -1,0 +1,205 @@
+.signup-parent{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: linear-gradient(
+        160deg,
+        #1c1e294d 0%,     
+        #111945a1 0%,     
+        #181a22 50%,
+        #14161e 100%
+    );
+    width: 100%;
+    height: 100vh;
+    animation: rotateBg 10s linear infinite;
+}
+@keyframes rotateBg  {
+    0%{
+        background-position: 0 0;
+    }
+    50%{
+        background-position: 100% 200%;
+    }
+    100%{
+        background-position: 0 0;
+    }
+}
+.signup-parent .bg{
+    width: 100%;
+    filter: brightness(.6);
+    height: 100%;
+    position: absolute;
+}
+.signup-parent .sign-overall{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 98%;
+    max-width: 500px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.076);
+    box-shadow: 
+    inset 0px 0px 10px rgba(255, 255, 255, 0.038),
+    0px 0px 10px rgba(255, 255, 255, 0.186)
+    ;
+    backdrop-filter: blur(10px) brightness(.9);
+    border-radius: 20px;
+    animation: rotateBg 20s linear infinite;
+}
+.signup-parent .sign-overall .form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 5px;
+}
+.signup-parent .sign-overall .lastInfo h1{
+    font-size: 28px !important;
+    /* margin-bottom: 5px; */
+}
+.signup-parent .sign-overall .form img{
+    width: 50px;
+}
+.signup-parent .sign-overall .form h1{
+    font-size: 40px;
+    color: white;
+}
+.signup-parent .sign-overall .form .profile-parent{
+    display: flex;
+    justify-content: center;
+    width: 110px;
+    height: 110px;
+    position: relative;
+    margin-top: 20px;
+}
+.signup-parent .sign-overall .lastInfo .profile-parent{
+    margin-bottom: 10px;
+    width: 110px !important;
+}
+.signup-parent .sign-overall .form .profile-parent label{
+    width: 100%;
+    height: 100%;
+}
+.signup-parent .sign-overall .form .profile-parent label .profileImg{
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    background: linear-gradient(45deg, #1945d8,#142e61, #1f4cef);
+    cursor: pointer;
+    border-radius: 50%;
+    animation: rotatebtn 20s linear infinite;
+    box-shadow: 0px 0px 50px #704ff439;
+}
+.signup-parent .sign-overall .lastInfo .profile-parent label .profileImg{
+    width: 110px;
+}
+
+.signup-parent .sign-overall .form p{
+    color: white;
+    align-self: flex-start;
+    font-weight: 600;
+    font-size: 15px;
+}
+.signup-parent .sign-overall .form .input{
+    width: 98%;
+    background: #D9D9D926;
+    position: relative;
+    height: 45px;
+    border-radius: 50px;
+    /* overflow: hidden; */
+}
+.signup-parent .sign-overall .lastInfo .input{
+    margin-bottom: 10px;
+    color: white;
+}
+.signup-parent .sign-overall .lastInfo .pIcon{
+    filter: invert(1) opacity(.6) !important;
+}
+.signup-parent .sign-overall .lastInfo .gender{
+    color: white;
+    display: flex;
+}
+.signup-parent .sign-overall .lastInfo label{
+    margin-right: 15px;
+    margin-left: 5px;
+}
+.signup-parent .sign-overall .form .input input{
+    width: 100%;
+    height: 100%;
+    padding-left: 20px;
+    background: transparent;
+    color: white;
+    font-weight: 600;
+    outline: 0;
+    border: 0;
+    border-radius: 50px;
+}
+.signup-parent .sign-overall .form .input input:focus{
+    border: 1px solid rgba(255, 255, 255, 0.173);
+    box-shadow: 0px 0px 10px #1f4cef41;
+}
+.signup-parent .sign-overall .form .input img{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    filter: opacity(.7);
+    transform: translateY(-50%);
+}
+.signup-parent .sign-overall .form button{
+    width: 98%;
+    padding: 12px 0px;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 50px;
+    font-size: 16px;
+    border: 0;
+    outline: 0;
+    margin-top: 10px;
+    background: linear-gradient(45deg, #1945d8,#142e61, #1f4cef);
+    background-size: 600%;
+    color: white;
+    animation: rotatebtn 20s linear infinite;
+    box-shadow: 0px 0px 50px #704ff45d;
+}
+@keyframes rotatebtn {
+    0%{
+        background-position: 0 0;
+    }
+    50%{
+        background-position: 400% 0;
+    }
+    100%{
+        background-position: 0 0;
+    }
+}
+.signup-parent .sign-overall .form button:hover{
+    box-shadow: 0px 0px 80px #704ff480;
+}
+.signup-parent .sign-overall .lastInfo .icons{
+    display: flex;
+    gap: 20px;
+    margin-bottom: 5px;
+}
+.signup-parent .sign-overall .lastInfo .icons img{
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+.signup-parent .sign-overall .lastInfo .icons img:nth-child(2){
+    filter: invert(1);
+}
+.signup-parent .sign-overall .lastInfo h6{
+    margin-top: 10px;
+    color: #2195f3a4;
+    cursor: pointer;
+}
+@media screen and (max-width:500px) {
+    .signup-parent .sign-overall{
+        height: 98vh !important;
+    }
+}
